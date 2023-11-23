@@ -1,7 +1,7 @@
 interface General {
     name: string;
     maxTroops: number;
-    minTroops?: number;
+    startsOn: string;
 }
 
 interface Army extends General {
@@ -11,4 +11,5 @@ interface Army extends General {
 interface Nation {
     armies: Army[];
     maxTroops: number;
+    name: string;
 }

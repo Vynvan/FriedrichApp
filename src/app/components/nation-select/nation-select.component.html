@@ -1,1 +1,12 @@
-<p>nation-select works!</p>
+<form id="nationSelectForm" (ngSubmit)="onSubmit()">
+    <div id="nationButtons">
+        <mat-button-toggle-group name="nationButtons" multiple [formGroup]="buttonToggles">
+            @for (nation of this.nationService.all.values(); track nation) {
+                <mat-button-toggle class="nationToggle" value="{nation.name}">{{ nation.name }}</mat-button-toggle>
+            }
+        </mat-button-toggle-group>
+    </div>
+    <div id="nationSubmit">
+        <button mat-fab type="submit"><mat-icon fontIcon="done" /></button>
+    </div>
+</form>

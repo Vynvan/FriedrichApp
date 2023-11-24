@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterOutlet } from '@angular/router';
+import { Router, RouterOutlet } from '@angular/router';
+import { NationService } from './services/nation.service';
 
 @Component({
   selector: 'app-root',
@@ -11,4 +12,10 @@ import { RouterOutlet } from '@angular/router';
 })
 export class AppComponent {
   title = 'FriedrichApp';
+
+  constructor(private nationService: NationService, private router: Router) {
+    if(this.nationService.picked.length == 0) {
+      this.router.navigate(['NationSelect']);
+    }
+  }
 }

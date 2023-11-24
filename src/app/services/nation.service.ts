@@ -8,7 +8,22 @@ import { Nation } from './model';
 })
 export class NationService {
 
-  constructor() { }
+  all: Map<string, Nation>;
+  picked: Nation[] = [];
+
+  constructor() {
+    let nations = [
+      NationService.initPrussia(),
+      NationService.initHannover(),
+      NationService.initAustria(),
+      NationService.initImperialArmy(),
+      NationService.initRussia(),
+      NationService.initSweden(),
+      NationService.initFrance()
+    ];
+    this.all = new Map<string, Nation>();
+    nations.forEach(n => this.all.set(n.name, n));
+  }
 
   private static initAustria(): Nation {
     return {

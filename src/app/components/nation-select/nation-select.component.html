@@ -1,8 +1,8 @@
 <form id="nationSelectForm" (ngSubmit)="onSubmit()">
     <div id="nationButtons">
-        <mat-button-toggle-group name="nationButtons" multiple [formGroup]="buttonToggles">
-            @for (nation of this.nationService.all.values(); track nation) {
-                <mat-button-toggle class="nationToggle" value="{nation.name}">{{ nation.name }}</mat-button-toggle>
+        <mat-button-toggle-group multiple [formGroup]="buttonToggles">
+            @for (nation of this.nations; track nation) {
+                <mat-button-toggle class="nationToggle" [formControlName]="nation.name">{{ nation.name }}</mat-button-toggle>
             }
         </mat-button-toggle-group>
     </div>

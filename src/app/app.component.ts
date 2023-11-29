@@ -15,14 +15,17 @@ export class AppComponent {
   title = 'FriedrichApp';
 
   constructor(private nations: NationService, private appState: AppStateService, private router: Router) {
-    this.appState.stateChanged.subscribe(this.computeState);
+    this.appState.stateChanged.subscribe(next => this.computeState(next));
     this.computeState();
   }
 
-
+  /**
+   * Eventhandler for AppState.stateChanged:
+   * Navigates to the sub-components according to the given state.
+   */
   private computeState(state?: AppState) {
-    console.log("compute state ", state?.toString());
     state = state ?? this.appState.state;
+    console.log("compute state ", state?.toString());
     switch(state) {
       case(AppState.pickNations): {
         this.router.navigate(['NationSelect']);

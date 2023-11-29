@@ -1,8 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component, ViewChild } from '@angular/core';
-import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Component } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MatButtonToggleGroup, MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatIconModule } from '@angular/material/icon';
 
 import { NationService } from '@app/services/nation.service';
@@ -18,17 +18,13 @@ import { AppStateService } from '@app/services/appState.service';
     MatButtonModule,
     MatButtonToggleModule,
     MatIconModule,
-    ReactiveFormsModule
   ],
   templateUrl: './nation-select.component.html',
-  styleUrl: './nation-select.component.scss'
+  styleUrl: './nation-select.component.scss',
 })
 export class NationSelectComponent {
   
-  buttonToggles: FormGroup;
   picked: any;
-  picked2: Nation[] = [];
-  @ViewChild('toggleGroup') private toggleGroup!: MatButtonToggleGroup;
   
   get nations(): IterableIterator<Nation> {
     return this.nationService.all.values();
@@ -40,16 +36,22 @@ export class NationSelectComponent {
     this.nationService.all.forEach(nation => {
       this.picked[nation.name] = false;
     });
-    let formGrp: any = {};
-    this.nationService.all.forEach(nation => {
-      formGrp[nation.name] = new FormControl(false, Validators.required);
-    });
-    this.buttonToggles = new FormGroup(formGrp);
-    console.log(this.picked);
-    console.log(this.toggleGroup);
   }
 
+  /**
+   * Eventhandler for every toggleButton:
+   * Updates this.picked according to the pressed button.
+   * @param name Name of the pressed button == its representive nation.
+   */
+  onChange(name: string) {
+    this.picked[name] = this.picked[name] ? false : true;
+  }
 
+  /**
+   * Eventhandler for the form:
+   * If 1 or more nations are picked, they are saved to the nationService and the AppState service will 
+   * be informed that this stage is completed.
+   */
   onSubmit(): void {
     console.log("Submit!");
     let i = 0;
@@ -59,14 +61,6 @@ export class NationSelectComponent {
       if (this.picked[nation.name] == true) {
         i++;
         p.push(nation);
-      }
-    });
-    this.nationService.all.forEach(nation => {
-      console.log(this.buttonToggles.controls[nation.name]);
-      if (this.buttonToggles.get(nation.name)?.value == true) {
-        i++;
-        this.nationService.picked.push(nation);
-        console.log("Picked " + nation.name);
       }
     });
     if (i >= 1) {

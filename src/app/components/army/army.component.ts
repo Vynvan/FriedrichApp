@@ -1,5 +1,6 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Observable } from 'rxjs';
 import { Army } from '@app/services/model';
 
 @Component({
@@ -11,8 +12,8 @@ import { Army } from '@app/services/model';
 })
 export class ArmyComponent {
 
-  @Input({ required: true })
-  army: Army | undefined;
+  @Input({ required: true }) 
+  army$: Observable<Army>;
   
 
   constructor() {

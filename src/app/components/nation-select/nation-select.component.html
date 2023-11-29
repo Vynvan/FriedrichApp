@@ -1,9 +1,10 @@
 <form id="nationSelectForm" (ngSubmit)="onSubmit()">
     <div id="nationButtons">
-        <mat-button-toggle-group #toggleGroup [formGroup]="this.buttonToggles" multiple>
+        <mat-button-toggle-group multiple>
             @for (nation of this.nations; track nation) {
-                <mat-button-toggle class="nationToggle" type="checkbox" ngDefaultControl 
-                    [name]="nation.name"                     
+                <mat-button-toggle class="nationToggle" type="button" ngDefaultControl 
+                    (change)="onChange(nation.name)" 
+                    [name]="nation.name" 
                     [value]="false">{{ nation.name }}
                 </mat-button-toggle>
             }

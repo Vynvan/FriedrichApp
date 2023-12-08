@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 
-import { Nation } from './model';
+import { Nation, Nation$ } from './model';
 
 
 @Injectable({
@@ -10,6 +10,14 @@ export class NationService {
 
   all: Map<string, Nation>;
   picked: Nation[] = [];
+
+  private _picked: Nation$[] = [];
+  get picked$(): Nation$[] {
+    if (!this._picked) {
+      this.picked.forEach(nation => this._picked.push(new Nation$(nation)));
+    }
+    return this._picked;
+  };
 
   constructor() {
     let nations = [

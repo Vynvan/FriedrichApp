@@ -1,1 +1,14 @@
-<p>components.army works!</p>
+<mat-card>
+    <mat-card-header>
+        <mat-card-title>{{ this.name$| async }}</mat-card-title>
+        <mat-card-subtitle>{{ this.startsOn$ | async }}</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+        @for (item of this.troopStates$ | async; track item[0]) {
+            <mat-icon (click)='onClick(item)'>
+                @if (item[1]) { face }
+                @else { home }
+            </mat-icon>            
+        }
+    </mat-card-content>
+</mat-card>

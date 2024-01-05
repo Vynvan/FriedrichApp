@@ -53,10 +53,8 @@ export class NationSelectComponent {
    * be informed that this stage is completed.
    */
   onSubmit(): void {
-    console.log("Submit!");
     let i = 0;
     let p: Nation[] = [];
-    console.log(this.picked);
     this.nationService.all.forEach(nation => {
       if (this.picked[nation.name] == true) {
         i++;

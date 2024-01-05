@@ -30,7 +30,7 @@ export class AppComponent {
    */
   private computeState(state?: AppState) {
     state = state ?? this.appState.state;
-    console.log("compute state ", state?.toString());
+    // console.log("compute state ", state?.toString());
     switch(state) {
       case(AppState.pickNations): {
         this.router.navigate(['NationSelect']);

@@ -7,5 +7,5 @@
     </div>
 </div>
 @for (army$ of this.armies$; track army$) {
-    <app-army [army$]="army$" (troopsChanged)="this.updateArmy"></app-army>
+    <app-army [army$]="army$" [editMode]="true" (troopsChanged)="this.updateArmy"></app-army>
 }

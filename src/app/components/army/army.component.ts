@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { BehaviorSubject, EMPTY, Observable, Subscription, map } from 'rxjs';
+import { BehaviorSubject, EMPTY, Observable, Subscription, combineLatest, map } from 'rxjs';
 
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
@@ -19,50 +19,56 @@ import { Army } from '@app/services/model';
 })
 export class ArmyComponent {
 
-  private _army!: Army;
-  private _troops: BehaviorSubject<[number, boolean][]>;
+  private allowEdit = false;
+  private army!: Army;
   private armySub?: Subscription;
+  private editSubj: BehaviorSubject<boolean>;
+  private troopsSubj: BehaviorSubject<[number, boolean][]>;
 
 
   /**
-   * Subscribes to the observable.
+   * Combines the given army$ and the editMode subject and subscribes, so whenever editMode or army$ changes, 
+   * a new troopstate is computed and updated via the troopsSubj.
    */
   @Input({ required: true }) 
   set army$(a: Observable<Army>) {
-    const ar: [number, boolean][] = [];
     if (this.armySub) {
       this.armySub.unsubscribe();
     }
-    this.armySub = a.subscribe(newArmy => {
-      this._army = newArmy;
+    this.armySub = combineLatest([this.editSubj.asObservable(), a]).subscribe(([edit, newArmy]) => {
+      const ar: [number, boolean][] = [];
+      this.allowEdit = edit;
+      this.army = newArmy;
       for (let i = 0; i < newArmy.troops; i++) {
         ar.push([i + 1, true]);
       }
-      if (this.editMode) {
+      if (edit) {
           for (let i = newArmy.troops; i < newArmy.maxTroops; i++) {
-            ar.push([i, false]);
+            ar.push([i + 1, false]);
           }
       }
-      this._troops.next(ar);
+      this.troopsSubj.next(ar);
     });
   }
 
   @Input({ required: false })
-  editMode: boolean = false;
+  set editMode(v: boolean) {
+    this.editSubj.next(v);
+  }
 
   @Output() troopsChanged = new EventEmitter<Army>();
 
 
   get name(): string {
-    return this._army.name;
+    return this.army.name;
   }
 
   get startsOn(): string {
-    return this._army.startsOn;
+    return this.army.startsOn;
   }
 
   get troops(): number {
-    return this._army.troops;
+    return this.army.troops;
   }
 
 
@@ -79,13 +85,18 @@ export class ArmyComponent {
   // }
 
   get troopStates$(): Observable<[number, boolean][]> {
-    return this._troops?.asObservable();
+    return this.troopsSubj.asObservable();
   }
 
 
   constructor() {
     const ar: [number, boolean][] = [];
-    this._troops = new BehaviorSubject(ar);
+    this.troopsSubj = new BehaviorSubject(ar);
+    this.editSubj = new  BehaviorSubject<boolean>(false);
+  }
+
+  ngOnInit(): void {
+    
   }
 
   /**
@@ -95,9 +106,9 @@ export class ArmyComponent {
    * @param troop 
    */
   onClick(troop: [number, boolean]) {
-    if (this.editMode) {
+    if (this.allowEdit) {
       let troopCount = 0;
-      const prev = this._troops.getValue();
+      const prev = this.troopsSubj.getValue();
       for (let i = 0; i < prev.length; i++) {
         if (prev[i][0] < troop[0])
           prev[i][1] = true;
@@ -117,8 +128,8 @@ export class ArmyComponent {
    * @param troopCount 
    */
   private submitChange(troopCount: number) {
-      this._army.troops = troopCount;
-      this.troopsChanged.emit(this._army);
+      this.army.troops = troopCount;
+      this.troopsChanged.emit(this.army);
   }
 
   ngOnDestroy() {

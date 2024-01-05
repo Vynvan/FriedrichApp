@@ -7,6 +7,7 @@ import { DistributeComponent } from './components/distribute/distribute.componen
 export const routes: Routes = [
     { path: '', component: AppComponent, children: [
         { path: 'NationSelect', component: NationSelectComponent },
-        { path: 'DistributeTroops', component: DistributeComponent }
+        { path: 'DistributeTroops', component: DistributeComponent },
+        { path: 'DistributeTroops/:nationName', component: DistributeComponent }
     ]}
 ];

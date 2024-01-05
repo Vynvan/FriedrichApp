@@ -9,15 +9,14 @@ import { Nation, Nation$ } from './model';
 export class NationService {
 
   all: Map<string, Nation>;
-  picked: Nation[] = [];
 
   private _picked: Nation$[] = [];
-  get picked$(): Nation$[] {
-    if (!this._picked) {
-      this.picked.forEach(nation => this._picked.push(new Nation$(nation)));
-    }
+  get picked(): Nation$[] {
     return this._picked;
-  };
+  }
+  set picked(nats: Nation[]) {
+    this._picked = nats.map(nat => new Nation$(nat));
+  }
 
   constructor() {
     let nations = [

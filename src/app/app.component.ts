@@ -1,13 +1,18 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterOutlet } from '@angular/router';
+
 import { NationService } from './services/nation.service';
 import { AppStateService, AppState } from './services/appState.service';
+
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet],
+  imports: [
+    CommonModule,
+    RouterOutlet
+  ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
@@ -32,7 +37,7 @@ export class AppComponent {
         break;
       }
       case(AppState.distributeTroops): {
-        this.router.navigate(['DistributeTroops']);
+        this.router.navigate(['DistributeTroops', this.nations.picked[0].name]);
         break;
       }
     }

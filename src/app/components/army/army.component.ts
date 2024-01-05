@@ -7,7 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { Army } from '@app/services/model';
 
 @Component({
-  selector: 'app-components.army',
+  selector: 'app-army',
   standalone: true,
   imports: [
     CommonModule,
@@ -19,50 +19,79 @@ import { Army } from '@app/services/model';
 })
 export class ArmyComponent {
 
+  private _army!: Army;
+  private _troops: BehaviorSubject<[number, boolean][]>;
+  private armySub?: Subscription;
+
+
+  /**
+   * Subscribes to the observable.
+   */
   @Input({ required: true }) 
-  army$: Observable<Army> = EMPTY;
+  set army$(a: Observable<Army>) {
+    const ar: [number, boolean][] = [];
+    if (this.armySub) {
+      this.armySub.unsubscribe();
+    }
+    this.armySub = a.subscribe(newArmy => {
+      this._army = newArmy;
+      for (let i = 0; i < newArmy.troops; i++) {
+        ar.push([i + 1, true]);
+      }
+      if (this.editMode) {
+          for (let i = newArmy.troops; i < newArmy.maxTroops; i++) {
+            ar.push([i, false]);
+          }
+      }
+      this._troops.next(ar);
+    });
+  }
 
   @Input({ required: false })
   editMode: boolean = false;
 
   @Output() troopsChanged = new EventEmitter<Army>();
 
-  get name$(): Observable<string> {
-    return this.army$.pipe(map(a => a.name));
+
+  get name(): string {
+    return this._army.name;
   }
 
-  get startsOn$(): Observable<string> {
-    return this.army$.pipe(map(a => a.startsOn));
+  get startsOn(): string {
+    return this._army.startsOn;
   }
 
-  get troops$(): Observable<string> {
-    return this.army$.pipe(map(a => '${a.troops} / ${a.maxTroops}'));
+  get troops(): number {
+    return this._army.troops;
   }
 
-  private _troops: BehaviorSubject<[number, boolean][]>;
+
+  // get name$(): Observable<string> {
+  //   return this.army$.pipe(map(a => a.name));
+  // }
+
+  // get startsOn$(): Observable<string> {
+  //   return this.army$.pipe(map(a => a.startsOn));
+  // }
+
+  // get troops$(): Observable<string> {
+  //   return this.army$.pipe(map(a => '${a.troops} / ${a.maxTroops}'));
+  // }
+
   get troopStates$(): Observable<[number, boolean][]> {
-    return this._troops.asObservable() ?? EMPTY;
+    return this._troops?.asObservable();
   }
 
-  private armySub: Subscription;
 
   constructor() {
     const ar: [number, boolean][] = [];
     this._troops = new BehaviorSubject(ar);
-    this.armySub = this.army$.subscribe(newArmy => {
-      for (let i = 0; i < newArmy.troops; i++)
-        ar.push([i + 1, true]);
-      if (this.editMode) {
-        for (let i = newArmy.troops; i < newArmy.maxTroops; i++)
-          ar.push([i, false]);
-      }
-      this._troops.next(ar);
-    });
   }
 
   /**
-   * Changes the clicked troopState icon AND changes the other troopStates accordingly. If the clicked icon was active, it turns into the first inactive. 
-   * If it was inactive it becomes the last active. After adjusting the icons, 'submitChange' emits the troopsChanged event.
+   * Only active in editMode.
+   * Changes the clicked troopState icon AND changes the other troopStates accordingly. If the clicked troop was active, it turns into the first inactive. 
+   * If it was inactive it becomes the last active. After that, 'submitChange' emits the troopsChanged event.
    * @param troop 
    */
   onClick(troop: [number, boolean]) {
@@ -79,7 +108,6 @@ export class ArmyComponent {
         else if (prev[i][0] > troop[0])
           prev[i][1] = false;
       }
-      this._troops.next(prev);
       this.submitChange(troopCount);
     }
   }
@@ -89,27 +117,11 @@ export class ArmyComponent {
    * @param troopCount 
    */
   private submitChange(troopCount: number) {
-    const sub = this.army$.subscribe(a => {
-      a.troops = troopCount;
-      this.troopsChanged.emit(a);
-      sub.unsubscribe();
-    });
-  }
-
-  /**
-   * Changes the value of exactly one troopState in the array.
-   * @param troop 
-   */
-  private changeTroopState(troop: [number, boolean]) {
-    const prev = this._troops.getValue();
-    const idx = prev.findIndex(val => val[0] === troop[0]);
-    if (idx >= 0) {
-      prev[idx][1] = troop[1];
-    }
-    this._troops.next(prev);
+      this._army.troops = troopCount;
+      this.troopsChanged.emit(this._army);
   }
 
   ngOnDestroy() {
-    this.armySub.unsubscribe();
+    this.armySub?.unsubscribe();
   }
 }

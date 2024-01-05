@@ -1,1 +1,11 @@
-<p>distribute works!</p>
+<app-nav [activeNation]="(this.nationName)"></app-nav>
+<div>
+    <title>{{ this.nationName }}</title>
+    <div>
+        <span>Total troops:</span>
+        <span>{{ this.troopCount$ | async }}</span>
+    </div>
+</div>
+@for (army$ of this.armies$; track army$) {
+    <app-army [army$]="army$" (troopsChanged)="this.updateArmy"></app-army>
+}

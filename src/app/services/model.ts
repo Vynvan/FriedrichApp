@@ -24,18 +24,24 @@ export class Nation$ implements Nation {
     armies$: Observable<Army>[];
     private _subjects = new Map<string, BehaviorSubject<Army>>();
 
+    get troops$(): Observable<number> {
+        return combineLatest(this.armies$).pipe(
+            map(armies => armies.map(a => a.troops)),
+            map(troops => troops.reduce((prev, curr) => prev + curr)));
+    }
+  
     constructor(n: Nation) {
-        this.armies$ = [];
         this.armies = n.armies;
         this.maxTroops = n.maxTroops;
         this.name = n.name;
+        this.armies$ = [];
         n.armies.forEach(a => {
             const bs = new BehaviorSubject<Army>(a);
             this._subjects.set(a.name, bs);
             this.armies$.push(bs.asObservable());
         });
     }
-
+    
     updateArmy(army: Army): void {
         const i = this.armies.findIndex(a => a.name === army.name);
         if (i != -1) {

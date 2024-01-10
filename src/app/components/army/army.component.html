@@ -2,14 +2,16 @@
     <mat-card-header>
         <mat-card-title>{{ this.name }}</mat-card-title>
         <mat-card-subtitle>{{ this.startsOn }}</mat-card-subtitle>
-        <mat-card-subtitle>{{ this.troops }} / </mat-card-subtitle>
+        <!-- <mat-card-subtitle>{{ this.troopString }}</mat-card-subtitle> -->
     </mat-card-header>
     <mat-card-content>
-        @for (item of (this.troopStates$ | async); track item[0]) {
-            <mat-icon (click)='onClick(item)'>
-                @if (item[1]) { face }
-                @else { home }
-            </mat-icon>            
+        @for (item of this.troopStates$ | async; track item) {
+            @if (item[1]) { 
+                <mat-icon (click)='onClick(item)'>face</mat-icon>
+            }
+            @else {
+                <mat-icon (click)='onClick(item)'>home</mat-icon>
+            }
         }
     </mat-card-content>
 </mat-card>

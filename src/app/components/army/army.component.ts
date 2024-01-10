@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { BehaviorSubject, EMPTY, Observable, Subscription, combineLatest, map } from 'rxjs';
+import { BehaviorSubject, combineLatest, Observable, of, Subject, Subscription } from 'rxjs';
 
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
@@ -21,32 +21,65 @@ export class ArmyComponent {
 
   private allowEdit = false;
   private army!: Army;
-  private armySub?: Subscription;
+  private combineSub?: Subscription;
   private editSubj: BehaviorSubject<boolean>;
+  private maxTroopsSub?: Subscription;
+  private maxTroopsSubj: Subject<number>;
   private troopsSubj: BehaviorSubject<[number, boolean][]>;
 
 
   /**
-   * Combines the given army$ and the editMode subject and subscribes, so whenever editMode or army$ changes, 
-   * a new troopstate is computed and updated via the troopsSubj.
+   * Combines the given army$ observable, the editMode subject, the maxTroops$ observable and subscribes, so whenever editMode or army$ changes, 
+   * a new troopstate is computed here and updated via the troopsSubj.
+   */
+  // @Input({ required: true }) 
+  // set army$max$(a: [Observable<Army>, Observable<number>]) {
+  //   if (this.combineSub) {
+  //     this.combineSub.unsubscribe();
+  //   }
+  //   this.combineSub = combineLatest([this.editSubj.asObservable(), ...a]).subscribe(([edit, newArmy, max]) => {
+  //     const ar: [number, boolean][] = [];
+  //     this.allowEdit = edit;
+  //     this.army = newArmy;
+  //     for (let i = 1; i <= newArmy.maxTroops; i++) {
+  //       if (i <= newArmy.troops) {
+  //         ar.push([i, true]);
+  //       }
+  //       else if (edit && (max - i) > 0) {
+  //         ar.push([i, false]);
+  //       }
+  //       else break;
+  //     }
+  //     console.log(`${newArmy.name} gets ${newArmy.troops} troops. Edit is ${edit}\n` + ar);
+  //     this.maxTroopsSubj.next(max);
+  //     this.troopsSubj.next(ar);
+  //   });
+  // }
+
+  /**
+   * Combines the given army$ observable and the editMode subject and subscribes, so whenever editMode or army$ changes, 
+   * a new troopstate is computed here and updated via the troopsSubj.
    */
   @Input({ required: true }) 
-  set army$(a: Observable<Army>) {
-    if (this.armySub) {
-      this.armySub.unsubscribe();
+  set armyMax$(a: Observable<[Army, number]>) {
+    if (this.combineSub) {
+      this.combineSub.unsubscribe();
     }
-    this.armySub = combineLatest([this.editSubj.asObservable(), a]).subscribe(([edit, newArmy]) => {
-      const ar: [number, boolean][] = [];
+    this.combineSub = combineLatest([this.editSubj.asObservable(), a]).subscribe(([edit, [newArmy, max]]) => {
+        const ar: [number, boolean][] = [];
       this.allowEdit = edit;
       this.army = newArmy;
-      for (let i = 0; i < newArmy.troops; i++) {
-        ar.push([i + 1, true]);
+      for (let i = 1; i <= newArmy.maxTroops; i++) {
+        if (i <= newArmy.troops) {
+          ar.push([i, true]);
+        }
+        else if (edit && (max - i) > 0) {
+          ar.push([i, false]);
+        }
+        else break;
       }
-      if (edit) {
-          for (let i = newArmy.troops; i < newArmy.maxTroops; i++) {
-            ar.push([i + 1, false]);
-          }
-      }
+      console.log(`${newArmy.name} gets ${newArmy.troops} troops. Edit is ${edit}\n` + ar);
+      this.maxTroopsSubj.next(max);
       this.troopsSubj.next(ar);
     });
   }
@@ -67,22 +100,9 @@ export class ArmyComponent {
     return this.army.startsOn;
   }
 
-  get troops(): number {
-    return this.army.troops;
+  get troopString(): string {
+    return `${this.army.troops} / ${this.army.maxTroops}`;
   }
-
-
-  // get name$(): Observable<string> {
-  //   return this.army$.pipe(map(a => a.name));
-  // }
-
-  // get startsOn$(): Observable<string> {
-  //   return this.army$.pipe(map(a => a.startsOn));
-  // }
-
-  // get troops$(): Observable<string> {
-  //   return this.army$.pipe(map(a => '${a.troops} / ${a.maxTroops}'));
-  // }
 
   get troopStates$(): Observable<[number, boolean][]> {
     return this.troopsSubj.asObservable();
@@ -93,31 +113,23 @@ export class ArmyComponent {
     const ar: [number, boolean][] = [];
     this.troopsSubj = new BehaviorSubject(ar);
     this.editSubj = new  BehaviorSubject<boolean>(false);
-  }
-
-  ngOnInit(): void {
-    
+    this.maxTroopsSubj = new Subject<number>();
   }
 
   /**
-   * Only active in editMode.
-   * Changes the clicked troopState icon AND changes the other troopStates accordingly. If the clicked troop was active, it turns into the first inactive. 
-   * If it was inactive it becomes the last active. After that, 'submitChange' emits the troopsChanged event.
+   * Only active in editMode and for all icons but the first.
+   * Computes the new troopCount according to the following conditions: If the clicked icon represents the last troop, its state gets switched, 
+   * otherwise the clicked icon becomes the last icon with the true state.
    * @param troop 
    */
   onClick(troop: [number, boolean]) {
-    if (this.allowEdit) {
-      let troopCount = 0;
-      const prev = this.troopsSubj.getValue();
-      for (let i = 0; i < prev.length; i++) {
-        if (prev[i][0] < troop[0])
-          prev[i][1] = true;
-        else if (prev[i][0] == troop[0]) {
-          prev[i][1] = !troop[1];
-          troopCount = !troop[1] ? troop[0] : troop[0] - 1;
-        }
-        else if (prev[i][0] > troop[0])
-          prev[i][1] = false;
+    if (this.allowEdit && troop[0] > 1) {
+      let troopCount: number
+      if (troop[0] == this.army.maxTroops) {
+        troopCount = !troop[1] ? troop[0] : troop[0] - 1;
+      }
+      else {
+        troopCount = troop[0];
       }
       this.submitChange(troopCount);
     }
@@ -133,6 +145,7 @@ export class ArmyComponent {
   }
 
   ngOnDestroy() {
-    this.armySub?.unsubscribe();
+    this.combineSub?.unsubscribe();
+    this.maxTroopsSub?.unsubscribe();
   }
 }

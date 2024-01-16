@@ -27,7 +27,7 @@ export class Nation$ implements Nation {
     get troops$(): Observable<number> {
         return combineLatest(this.armies$).pipe(
             map(armies => armies.map(a => a.troops)),
-            map(troops => troops.reduce((prev, curr) => prev + curr)));
+            map(troops => troops.reduce((prev, curr) => prev + curr, 0)));
     }
   
     constructor(n: Nation) {
@@ -41,7 +41,7 @@ export class Nation$ implements Nation {
             this.armies$.push(bs.asObservable());
         });
     }
-    
+
     updateArmy(army: Army): void {
         const i = this.armies.findIndex(a => a.name === army.name);
         if (i != -1) {

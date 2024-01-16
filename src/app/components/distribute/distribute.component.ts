@@ -60,7 +60,7 @@ export class DistributeComponent {
 
   constructor(private nations: NationService, private route: ActivatedRoute) {
     let nationName = this.route.snapshot.paramMap.get('nationName');
-    this._nation = this.nations.picked.find(nation => nation.name === nationName) ?? this.nations.picked[0] ?? this.nations.picked[0];
+    this._nation = this.nations.picked.find(nation => nation.name === nationName) ?? this.nations.picked[0];
   }
 
   /**

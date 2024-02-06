@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { combineLatest, distinctUntilChanged, map, Observable, Subscription } from 'rxjs';
 import { Army, Nation$ } from '@app/services/model';
-import { NationService } from '@app/services/nation.service';
+import { NationService } from '@app/services/nation/nation.service';
 import { ArmyComponent } from '../army/army.component';
 import { NavComponent } from '../nav/nav.component';
 import { SimpleArmyComponent } from "../simple-army/simple-army.component";

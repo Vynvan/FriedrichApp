@@ -1,5 +1,5 @@
 import { Injectable, EventEmitter } from '@angular/core';
-import { NationService } from './nation.service';
+import { NationService } from '../nation/nation.service';
 
 
 export enum AppState {

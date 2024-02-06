@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 
-import { Nation, Nation$ } from './model';
+import { Nation, Nation$ } from '../model';
 
 
 @Injectable({
@@ -10,6 +10,7 @@ export class NationService {
 
   all: Map<string, Nation>;
 
+  
   private _picked: Nation$[] = [];
   get picked(): Nation$[] {
     return this._picked;
@@ -17,6 +18,7 @@ export class NationService {
   set picked(nats: Nation[]) {
     this._picked = nats.map(nat => new Nation$(nat));
   }
+
 
   constructor() {
     let nations = [
@@ -31,6 +33,7 @@ export class NationService {
     this.all = new Map<string, Nation>();
     nations.forEach(n => this.all.set(n.name, n));
   }
+
 
   private static initAustria(): Nation {
     return {

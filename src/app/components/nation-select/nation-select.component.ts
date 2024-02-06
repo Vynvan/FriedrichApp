@@ -5,7 +5,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatIconModule } from '@angular/material/icon';
 
-import { NationService } from '@app/services/nation.service';
+import { NationService } from '@app/services/nation/nation.service';
 import { Nation } from '@app/services/model';
 import { AppStateService } from '@app/services/appState/appState.service';
 

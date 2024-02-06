@@ -2,8 +2,8 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterOutlet } from '@angular/router';
 
-import { NationService } from './services/nation.service';
-import { AppStateService, AppState } from './services/appState.service';
+import { NationService } from './services/nation/nation.service';
+import { AppStateService, AppState } from './services/appState/appState.service';
 
 
 @Component({

@@ -1,8 +1,9 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { map, Observable, ReplaySubject, Subject, Subscription } from 'rxjs';
+import { ActivatedRoute } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
+import { map, Observable, ReplaySubject, Subject, Subscription } from 'rxjs';
 import { Army } from '@app/services/model';
 
 @Component({
@@ -22,11 +23,17 @@ export class ArmyComponent {
   private _armyMax!: number;
   private _armyMax$!: Observable<[Army, number]>;
   private armySub?: Subscription;
+  private paramSub?: Subscription;
   private troopsSubj: Subject<[number, boolean][]>;
 
   @Input({ required: true })
   set armyMax$(a: Observable<[Army, number]>) {
     this._armyMax$ = a;
+    if (this.armySub) { // BETTER USE AN EVENT IN DISTRIBUTE.COMPONENT
+      this.armySub.unsubscribe();
+      this.subscribeToArmy();
+      console.log('Setter subscribed to army ', this._army.name);
+    }
   }
 
   @Input({ required: false })
@@ -55,30 +62,16 @@ export class ArmyComponent {
   }
 
 
-  constructor() {
+  constructor(private route: ActivatedRoute) {
     this.troopsChanged = new EventEmitter<Army>();
     this.troopsSubj = new ReplaySubject<[number, boolean][]>(1);
   }
 
-  /**
-   * Subscribes to the army observable, so whenever army$ changes, a new troopstate is computed here and updated via the troopsSubj.
-   */
   ngOnInit() {
-    this.armySub = this._armyMax$.subscribe(([newArmy, max]) => {
-        const ar: [number, boolean][] = [];
-      this._army = newArmy;
-      this._armyMax = this._army.troops + max;
-      for (let i = 1; i <= newArmy.maxTroops; i++) {
-        if (i <= newArmy.troops) {
-          ar.push([i, true]);
-        }
-        else if (this.editMode && (this._armyMax - i) >= 0) {
-          ar.push([i, false]);
-        }
-        else break;
-      }
-      console.log(`${newArmy.name} gets ${newArmy.troops} troops. Edit is ${this.editMode}. max is ${this._armyMax}\n` + ar);
-      this.troopsSubj.next(ar);
+    this.paramSub = this.route.params.subscribe(params => {
+      this.armySub?.unsubscribe();
+      this.subscribeToArmy();
+      console.log('params.subscribtion subscribed to army ', this._army.name);
     });
   }
 
@@ -111,7 +104,30 @@ export class ArmyComponent {
       this.troopsChanged.emit(this._army);
   }
 
+  /**
+   * Subscribes to the army observable, so whenever army$ changes, a new troopstate is computed here and updated via the troopsSubj.
+   */
+  private subscribeToArmy() {
+    this.armySub = this._armyMax$.subscribe(([newArmy, max]) => {
+      const ar: [number, boolean][] = [];
+      this._army = newArmy;
+      this._armyMax = this._army.troops + max;
+      for (let i = 1; i <= newArmy.maxTroops; i++) {
+        if (i <= newArmy.troops) {
+          ar.push([i, true]);
+        }
+        else if (this.editMode && (this._armyMax - i) >= 0) {
+          ar.push([i, false]);
+        }
+        else break;
+      }
+      // console.log(`${newArmy.name} gets ${newArmy.troops} troops. Edit is ${this.editMode}. max is ${this._armyMax}\n` + ar);
+      this.troopsSubj.next(ar);
+    });
+  }
+
   ngOnDestroy() {
     this.armySub?.unsubscribe();
+    this.paramSub?.unsubscribe();
   }
 }

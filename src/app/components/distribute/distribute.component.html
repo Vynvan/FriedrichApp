@@ -6,6 +6,9 @@
         <span>{{ this.troops$ | async }} / {{ this.maxTroops }}</span>
     </div>
 </div>
-@for (army$ of this.armiesMax$; track $index) {
+<!-- @for (army$ of this.armiesMax$; track $index) {
     <app-army [armyMax$]="army$" [editMode]="true" (troopsChanged)="updateArmy($event)"></app-army>
+} -->
+@for (army of this.armies$ | async; track $index) {
+    <app-simple-army [army]="army" [editMode]="true" [remaining]="(this.remainingTroops$ | async) ?? 0" (troopsChanged)="updateArmy($event)"></app-simple-army>
 }

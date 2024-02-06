@@ -7,7 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 
 import { NationService } from '@app/services/nation.service';
 import { Nation } from '@app/services/model';
-import { AppStateService } from '@app/services/appState.service';
+import { AppStateService } from '@app/services/appState/appState.service';
 
 @Component({
   selector: 'app-nation-select',

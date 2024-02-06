@@ -1,4 +1,12 @@
-import { BehaviorSubject, Observable, Subject, combineLatest, map, mergeMap } from "rxjs";
+import { BehaviorSubject, Observable, combineLatest, map } from "rxjs";
+
+
+export const dummy: Army = {
+    name: 'dummy',
+    maxTroops: 0,
+    startsOn: 'dummy',
+    troops: 0
+}
 
 export interface General {
     name: string;

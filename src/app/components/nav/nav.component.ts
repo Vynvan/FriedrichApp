@@ -4,7 +4,7 @@ import { RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
-import { AppState, AppStateService } from '@app/services/appState.service';
+import { AppState, AppStateService } from '@app/services/appState/appState.service';
 import { NationService } from '@app/services/nation.service';
 
 @Component({

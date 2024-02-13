@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 
-import { Nation, Nation$ } from '../model';
+import { Nation, Nation$ } from '@services/model';
+import { AppSessionService } from '@services/appSession/appSession.service';
 
 
 @Injectable({
@@ -13,14 +14,24 @@ export class NationService {
   
   private _picked: Nation$[] = [];
   get picked(): Nation$[] {
+    if (this._picked.length == 0)
+      this.picked = this.session.getPicked(this.all);
     return this._picked;
   }
   set picked(nats: Nation[]) {
-    this._picked = nats.map(nat => new Nation$(nat));
+    this._picked = nats.map(nat => {
+      let n = new Nation$(nat);
+      n.updated.subscribe(army => this.session.saveArmy(army.name, army.troops));
+      return n;
+    });
   }
 
 
-  constructor() {
+  /**
+   * Initializes the all nations map and looksup in the session for picked nations.
+   * @param session 
+   */
+  constructor(private session: AppSessionService) {
     let nations = [
       NationService.initPrussia(),
       NationService.initHannover(),
@@ -121,5 +132,4 @@ export class NationService {
       ]
     }
   }
-
 }

@@ -4,7 +4,7 @@
             <label>{{ name }}</label>
         }
         @else {
-            <a [routerLink]="['/', this.parent, name]">{{ name }}</a>
+            <a [routerLink]="navigateTo(name)">{{ name }}</a>
         }
     }
     <button mat-button [matMenuTriggerFor]="menu"><mat-icon fontIcon="menu"></mat-icon></button>

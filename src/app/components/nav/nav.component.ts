@@ -4,8 +4,12 @@ import { RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
-import { AppState, AppStateService } from '@app/services/appState/appState.service';
-import { NationService } from '@app/services/nation/nation.service';
+
+import { AppSessionService } from '@services/appSession/appSession.service';
+import { AppState, AppStateService } from '@services/appState/appState.service';
+import { NationService } from '@services/nation/nation.service';
+
+
 
 @Component({
   selector: 'app-nav',
@@ -22,6 +26,17 @@ import { NationService } from '@app/services/nation/nation.service';
 })
 export class NavComponent {
 
+  private _activeNation!: string;
+  @Input({ required: true })
+  set activeNation(a: string) {
+    this._activeNation = a;
+    console.log('Nav: Set active ' + a);
+    this.session.saveActive(a);
+  }
+  get activeNation(): string {
+    return this._activeNation;
+  }
+  
   get nationNames(): string[] {
     return this.nations.picked.map(nat => nat.name);
   }
@@ -35,9 +50,11 @@ export class NavComponent {
     }
   }
 
-  @Input({ required: true }) activeNation!: string;
-  
 
-  constructor(private nations: NationService, private state: AppStateService) {}
+  constructor(private nations: NationService, private session: AppSessionService, private state: AppStateService) {}
 
+
+  navigateTo(nationName: string): string {
+    return `/${ this.parent }/${ nationName }`;
+  }
 }

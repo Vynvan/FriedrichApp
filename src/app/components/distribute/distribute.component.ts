@@ -1,12 +1,12 @@
-import { ChangeDetectorRef, Component, Input } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
 import { combineLatest, distinctUntilChanged, map, Observable, Subscription } from 'rxjs';
-import { Army, Nation$ } from '@app/services/model';
-import { NationService } from '@app/services/nation/nation.service';
-import { ArmyComponent } from '../army/army.component';
-import { NavComponent } from '../nav/nav.component';
-import { SimpleArmyComponent } from "../simple-army/simple-army.component";
+
+import { ArmyComponent } from '@components/army/army.component';
+import { NavComponent } from '@components/nav/nav.component';
+import { SimpleArmyComponent } from "@components/simple-army/simple-army.component";
+import { Army, Nation$ } from '@services/model';
+import { NationService } from '@services/nation/nation.service';
 
 
 /**
@@ -35,9 +35,12 @@ export class DistributeComponent {
   set nationName(name: string) {
     this._nation = this.nations.picked.find(nation => nation.name === name) ?? this.nations.picked[0];
   }
+  get nationName(): string {
+    return this._nation.name;
+  }
   
   /**
-   * Returns an combineLatest of each army paired with the maximal troops to add. 
+   * DEPRICATED! Returns an combineLatest of each army paired with the maximal troops to add. 
    * The maxTroops is filtered to igrnore changes that are irrelevant because they are higher than maxTroops of the army.
    */
   get armiesMax$(): Observable<[Army, number]>[] {
@@ -45,14 +48,14 @@ export class DistributeComponent {
     return this._nation.armies$.map(army$ => combineLatest([army$, maxTroopsFiltered$]));
   }
 
+  get armies$(): Observable<Army[]> {
+    return combineLatest(this._nation.armies$);
+  }
+
   get maxTroops(): number {
     return this._nation.maxTroops;
   }
 
-  get nationName(): string {
-    return this._nation.name;
-  }
-  
   get remainingTroops$(): Observable<number> {
     return combineLatest(this._nation.armies$).pipe(
       map(armies => armies.map(a => a.troops)),
@@ -65,12 +68,8 @@ export class DistributeComponent {
     return this._nation.troops$;
   }
 
-  get armies$(): Observable<Army[]> {
-    return combineLatest(this._nation.armies$);
-  }
 
-
-  constructor(private nations: NationService, private route: ActivatedRoute) {
+  constructor(private nations: NationService) {
     // let nationName = this.route.snapshot.paramMap.get('nationName');
     // this._nation = this.nations.picked.find(nation => nation.name === nationName) ?? this.nations.picked[0];
     // if (this.nations.picked.length > 1) {

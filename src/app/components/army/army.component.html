@@ -1,8 +1,8 @@
 <mat-card>
     <mat-card-header>
-        <mat-card-title>{{ this.name$ | async }}</mat-card-title>
-        <mat-card-subtitle>{{ this.startsOn$ | async }}</mat-card-subtitle>
-        <mat-card-subtitle>{{ this.troopString$ | async }}</mat-card-subtitle>
+        <mat-card-title>{{ this.name }}</mat-card-title>
+        <mat-card-subtitle>{{ this.startsOn }}</mat-card-subtitle>
+        <mat-card-subtitle>{{ this.troopString }}</mat-card-subtitle>
     </mat-card-header>
     <mat-card-content>
         @for (item of (this.troopStates$) | async; track item[0]) {

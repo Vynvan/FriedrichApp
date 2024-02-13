@@ -10,8 +10,5 @@
     <app-army [armyMax$]="army$" [editMode]="true" (troopsChanged)="updateArmy($event)"></app-army>
 } -->
 @for (army of this.armies$ | async; track $index) {
-    <app-army [army]="army" [editMode]="true" [remaining]="(this.remainingTroops$ | async) ?? 0" (troopsChanged)="updateArmy($event)"></app-army>
+    <app-army [army]="army" [editMode]="false" [remaining]="(this.remainingTroops$ | async) ?? 0" (troopsChanged)="updateArmy($event)"></app-army>
 }
-<div id="distributeButtons">
-    
-</div>

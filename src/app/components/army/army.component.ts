@@ -1,10 +1,13 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, numberAttribute } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
-import { map, Observable, ReplaySubject, Subject, Subscription } from 'rxjs';
-import { Army } from '@app/services/model';
+import { Observable, ReplaySubject, Subject } from 'rxjs';
+
+import { Army, dummy } from '@app/services/model';
+
+
 
 @Component({
   selector: 'app-army',
@@ -17,44 +20,43 @@ import { Army } from '@app/services/model';
   templateUrl: './army.component.html',
   styleUrl: './army.component.scss'
 })
-export class ArmyComponent {
+export class ArmyComponent implements OnChanges {
 
-  private _army!: Army;
-  private _armyMax!: number;
-  private _armyMax$!: Observable<[Army, number]>;
-  private armySub?: Subscription;
-  private paramSub?: Subscription;
+  private _army: Army = dummy;
+  private _edit?: boolean;
+  private _remaining!: number;
   private troopsSubj: Subject<[number, boolean][]>;
 
+  
   @Input({ required: true })
-  set armyMax$(a: Observable<[Army, number]>) {
-    this._armyMax$ = a;
-    if (this.armySub) { // BETTER USE AN EVENT IN DISTRIBUTE.COMPONENT
-      this.armySub.unsubscribe();
-      this.subscribeToArmy();
-      console.log('Setter subscribed to army ', this._army.name);
-    }
+  set army(a: Army) {
+    this._army = a;
   }
 
   @Input({ required: false })
-  editMode = false;
+  set editMode(e: boolean) {
+    this._edit = e;
+  }
+
+  @Input({ required: true, transform: numberAttribute })
+  set remaining(r: number) {
+    this._remaining = r;
+  }
+
 
   @Output() troopsChanged;
 
-  get army$(): Observable<Army> {
-    return this._armyMax$.pipe(map(([army, _]) => army));
+
+  get name(): string {
+    return this._army.name;
   }
 
-  get name$(): Observable<string> {
-    return this.army$.pipe(map(a => a.name));
+  get startsOn(): string {
+    return this._army.startsOn;
   }
 
-  get startsOn$(): Observable<string> {
-    return this.army$.pipe(map(a => a.startsOn));
-  }
-
-  get troopString$(): Observable<string> {
-    return this.army$.pipe(map(army => `${army.troops} / ${army.maxTroops}`));
+  get troopString(): string {
+    return `${this._army.troops} / ${this._army.maxTroops}`;
   }
 
   get troopStates$(): Observable<[number, boolean][]> {
@@ -62,17 +64,18 @@ export class ArmyComponent {
   }
 
 
-  constructor(private route: ActivatedRoute) {
+  constructor() {
     this.troopsChanged = new EventEmitter<Army>();
     this.troopsSubj = new ReplaySubject<[number, boolean][]>(1);
   }
 
-  ngOnInit() {
-    this.paramSub = this.route.params.subscribe(params => {
-      this.armySub?.unsubscribe();
-      this.subscribeToArmy();
-      console.log('params.subscribtion subscribed to army ', this._army.name);
-    });
+
+  ngOnChanges(changes: SimpleChanges): void {
+    const relevantChange = changes['army'] || changes['editMode'] || changes['remaining'];
+    const validInputs = this._army.name != 'dummy' && this._edit != undefined && this._remaining != undefined;
+    if (relevantChange && validInputs) {
+      this.setTroops();
+    }
   }
 
   /**
@@ -81,20 +84,42 @@ export class ArmyComponent {
    * otherwise the clicked icon becomes the last icon with the true state.
    * @param troop 
    */
-  onClick(troop: [number, boolean]) {
-    if (this.editMode && troop[0] > 1) {
+  onClick([troopIndex, isEnabled]: [number, boolean]) {
+    if (this._edit && (troopIndex > 1 || isEnabled)) {
       let troopCount: number;
-      let troopMax = this._armyMax < this._army.maxTroops ? this._armyMax : this._army.maxTroops;
-      if (troop[0] == troopMax) {
-        troopCount = troop[1] ? troop[0]-1 : troop[0];
+      let last = troopIndex > 1 && isEnabled && troopIndex == this._army.troops; // If last enabled and not the first troop
+      let max = this.getMaxTroops();
+      if (troopIndex == max || last) { // If last selectable
+        troopCount = isEnabled ? troopIndex-1 : troopIndex;
       }
       else {
-        troopCount = troop[0];
+        troopCount = troopIndex;
       }
       this.submitChange(troopCount);
     }
   }
 
+  private getMaxTroops(): number {
+    return this._army.troops + this._remaining < this._army.maxTroops ? this._army.troops + this._remaining : this._army.maxTroops;
+  }
+  
+  /**
+   * Subscribes to the army observable, so whenever army$ changes, a new troopstate is computed here and updated via the troopsSubj.
+   */
+  private setTroops() {
+    const ar: [number, boolean][] = [];
+    for (let i = 1; i <= this._army.maxTroops; i++) {
+      if (i <= this._army.troops) {
+        ar.push([i, true]);
+      }
+      else if (this._edit && (this.getMaxTroops() - i) >= 0) {
+        ar.push([i, false]);
+      }
+      else break;
+    }
+    this.troopsSubj.next(ar);
+  }
+  
   /**
    * Subscribes to the army$ observable, edits the given army and emits if via the troopsChanged event. Unsubcribes after that.
    * @param troopCount 
@@ -102,32 +127,5 @@ export class ArmyComponent {
   private submitChange(troopCount: number) {
       this._army.troops = troopCount;
       this.troopsChanged.emit(this._army);
-  }
-
-  /**
-   * Subscribes to the army observable, so whenever army$ changes, a new troopstate is computed here and updated via the troopsSubj.
-   */
-  private subscribeToArmy() {
-    this.armySub = this._armyMax$.subscribe(([newArmy, max]) => {
-      const ar: [number, boolean][] = [];
-      this._army = newArmy;
-      this._armyMax = this._army.troops + max;
-      for (let i = 1; i <= newArmy.maxTroops; i++) {
-        if (i <= newArmy.troops) {
-          ar.push([i, true]);
-        }
-        else if (this.editMode && (this._armyMax - i) >= 0) {
-          ar.push([i, false]);
-        }
-        else break;
-      }
-      // console.log(`${newArmy.name} gets ${newArmy.troops} troops. Edit is ${this.editMode}. max is ${this._armyMax}\n` + ar);
-      this.troopsSubj.next(ar);
-    });
-  }
-
-  ngOnDestroy() {
-    this.armySub?.unsubscribe();
-    this.paramSub?.unsubscribe();
   }
 }

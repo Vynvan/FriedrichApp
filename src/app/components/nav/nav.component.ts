@@ -27,10 +27,11 @@ import { NationService } from '@services/nation/nation.service';
 export class NavComponent {
 
   private _activeNation!: string;
+
+
   @Input({ required: true })
   set activeNation(a: string) {
     this._activeNation = a;
-    console.log('Nav: Set active ' + a);
     this.session.saveActive(a);
   }
   get activeNation(): string {

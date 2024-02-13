@@ -5,9 +5,6 @@ import { Nation } from '@services/model';
 
 
 
-/**
- * TODO: COPY THE SSR-STATEMENT TO HERE !!!
- */
 @Injectable({
   providedIn: 'root'
 })
@@ -23,7 +20,6 @@ export class AppSessionService {
 
   getActive(): string | null {
     if (this.isBrowser) {
-      console.log(`Session: Got active ${ sessionStorage.getItem('active') }.`);
       return sessionStorage.getItem('active');
     }
     return null;
@@ -53,7 +49,6 @@ export class AppSessionService {
             picked.push(nation);
           }
         });
-        console.log(`Session: Picked ${ picked.length } nations.`)
       }
     }
     return picked;
@@ -65,7 +60,6 @@ export class AppSessionService {
    */
   getState(): number {
     if (this.isBrowser) {
-      console.log(`Session: Got state ${ sessionStorage.getItem('state') }.`);
       return Number(sessionStorage.getItem('state') ?? 0);
     }
     return 0;
@@ -73,7 +67,6 @@ export class AppSessionService {
 
   saveActive(name: string) {
     sessionStorage.setItem('active', name);
-    console.log('Session: Set active to ' + name);
   }
 
   saveArmy(name: string, troops: number) {

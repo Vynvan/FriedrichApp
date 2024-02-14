@@ -27,7 +27,7 @@ import { NationService } from '@services/nation/nation.service';
 })
 export class NationComponent {
 
-  private _nation!: Nation$;
+  protected _nation!: Nation$;
   private paramSub?: Subscription;
 
   @Input()
@@ -59,7 +59,7 @@ export class NationComponent {
   }
 
 
-  constructor(private nations: NationService) {  }
+  constructor(protected nations: NationService) {  }
 
 
   /**

@@ -10,8 +10,27 @@
     <app-army [armyMax$]="army$" [editMode]="true" (troopsChanged)="updateArmy($event)"></app-army>
 } -->
 @for (army of this.armies$ | async; track $index) {
-    <app-army [army]="army" [editMode]="true" [remaining]="(this.remainingTroops$ | async) ?? 0" (troopsChanged)="updateArmy($event)"></app-army>
+    <app-army [army]="army" [editMode]="true" [remaining]="(this.remainingTroops$ | async) ?? 0" (troopsChanged)="this.updateArmy($event)"></app-army>
 }
 <div id="distributeButtons">
-    
+    <button mat-fab id="cancelButton">
+        <mat-icon>close</mat-icon>
+    </button>
+    @if (this.ready | async) {
+        <button mat-fab id="submitButton" type="submit" (click)="this.onSubmit()">
+            <mat-icon>done</mat-icon>
+        </button>
+    }
+    @else {
+        @if (!this.first) {
+            <button mat-fab id="submitButton" type="submit" (click)="this.previousNation()">
+                <mat-icon>arrow_back</mat-icon>
+            </button>
+        }
+        @if (!this.last) {
+            <button mat-fab id="submitButton" type="submit" (click)="this.nextNation()">
+                <mat-icon>arrow_forward</mat-icon>
+            </button>
+        }
+    }
 </div>

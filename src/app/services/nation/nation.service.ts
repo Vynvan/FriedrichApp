@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 
 import { Nation, Nation$ } from '@services/model';
-import { AppSessionService } from '@services/appSession/appSession.service';
+import { SessionService } from '@app/services/session/session.service';
 
 
 @Injectable({
@@ -31,7 +31,7 @@ export class NationService {
    * Initializes the all nations map and looksup in the session for picked nations.
    * @param session 
    */
-  constructor(private session: AppSessionService) {
+  constructor(private session: SessionService) {
     let nations = [
       NationService.initPrussia(),
       NationService.initHannover(),

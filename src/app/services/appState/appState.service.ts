@@ -1,7 +1,7 @@
 import { Injectable, EventEmitter } from '@angular/core';
 
 import { NationService } from '@services/nation/nation.service';
-import { AppSessionService } from '@services/appSession/appSession.service';
+import { SessionService } from '@app/services/session/session.service';
 
 
 export enum AppState {
@@ -10,8 +10,7 @@ export enum AppState {
   inGame,
   fight,
   buyTroops,
-  afterGame,
-  unknown
+  afterGame
 }
 
 
@@ -26,11 +25,8 @@ export enum AppState {
 })
 export class AppStateService {
 
-  private _state: AppState = AppState.unknown;
+  private _state: AppState;
   get state(): AppState {
-    if (this._state == AppState.unknown) {
-      this._state = this.session.getState();
-    }
     return this._state;
   }
   private set state(st: AppState) {
@@ -40,10 +36,20 @@ export class AppStateService {
   public stateChanged = new EventEmitter<AppState>()
 
 
-  constructor(private nations: NationService, private session: AppSessionService) {
+  constructor(private nations: NationService, private session: SessionService) {
+    this._state = this.session.getState() ?? AppState.pickNations;
     this.stateChanged.subscribe(next => this.session.saveState(next));
   }
 
+
+  /**
+   * Resets the app to start all over.
+   */
+  cancel() {
+    this.session.delete(this.nations.picked);
+    this._state = AppState.pickNations;
+    this.stateChanged.emit(AppState.pickNations);
+  }
 
   /**
    * If a state completes, the state of the services is checked to decide what stage comes next.

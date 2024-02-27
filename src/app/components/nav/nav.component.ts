@@ -5,7 +5,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 
-import { AppSessionService } from '@services/appSession/appSession.service';
+import { SessionService } from '@app/services/session/session.service';
 import { AppState, AppStateService } from '@services/appState/appState.service';
 import { NationService } from '@services/nation/nation.service';
 
@@ -52,7 +52,7 @@ export class NavComponent {
   }
 
 
-  constructor(private nations: NationService, private session: AppSessionService, private state: AppStateService) {}
+  constructor(private nations: NationService, private session: SessionService, private state: AppStateService) {}
 
 
   navigateTo(nationName: string): string {

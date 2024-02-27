@@ -1,5 +1,5 @@
-import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
+import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
 
 import { Nation } from '@services/model';
 
@@ -8,7 +8,7 @@ import { Nation } from '@services/model';
 @Injectable({
   providedIn: 'root'
 })
-export class AppSessionService {
+export class SessionService {
 
   private isBrowser: boolean;
 
@@ -17,6 +17,15 @@ export class AppSessionService {
     this.isBrowser = isPlatformBrowser(platformId);
   }
 
+
+  delete(picked: Nation[]) {
+    picked.forEach(nation => {
+      nation.armies.forEach(army => sessionStorage.removeItem(army.name));
+    });
+    sessionStorage.removeItem('active');
+    sessionStorage.removeItem('nations');
+    sessionStorage.removeItem('state');
+  }
 
   getActive(): string | null {
     if (this.isBrowser) {
@@ -36,7 +45,7 @@ export class AppSessionService {
     if (this.isBrowser) {
       let nationsStr = sessionStorage.getItem('nations');
       if (nationsStr) {
-        let nationNames = nationsStr.split(' ');
+        let nationNames = nationsStr.split(';');
         nationNames.forEach(name => {
           let nation = all.get(name);
           if (nation) {
@@ -75,7 +84,7 @@ export class AppSessionService {
 
   saveNations(nations: Nation[]) {
     let names = '';
-    nations.forEach(nation => names += nation.name + ' ');
+    nations.forEach(nation => names += nation.name + ';');
     sessionStorage.setItem('nations', names);
   }
 

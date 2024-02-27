@@ -13,7 +13,7 @@
     <app-army [army]="army" [editMode]="true" [remaining]="(this.remainingTroops$ | async) ?? 0" (troopsChanged)="this.updateArmy($event)"></app-army>
 }
 <div id="distributeButtons">
-    <button mat-fab id="cancelButton">
+    <button mat-fab id="cancelButton" (click)="this.onCancel()">
         <mat-icon>close</mat-icon>
     </button>
     @if (this.ready | async) {

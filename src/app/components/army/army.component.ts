@@ -1,6 +1,5 @@
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, numberAttribute } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { Observable, ReplaySubject, Subject } from 'rxjs';
@@ -87,7 +86,7 @@ export class ArmyComponent implements OnChanges {
   onClick([troopIndex, isEnabled]: [number, boolean]) {
     if (this._edit && (troopIndex > 1 || isEnabled)) {
       let troopCount: number;
-      let last = troopIndex > 1 && isEnabled && troopIndex == this._army.troops; // If last enabled and not the first troop
+      let last = troopIndex > 1 && isEnabled && troopIndex == this._army.troops; // If not the first troop and last enabled
       let max = this.getMaxTroops();
       if (troopIndex == max || last) { // If last selectable
         troopCount = isEnabled ? troopIndex-1 : troopIndex;

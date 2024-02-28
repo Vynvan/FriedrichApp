@@ -32,8 +32,7 @@ export class AppStateService {
     this._state = st;
   }
 
-  public forget = new EventEmitter();
-  public stateChanged = new EventEmitter<AppState>();
+  stateChanged = new EventEmitter<AppState>();
 
 
   constructor(private session: SessionService) {
@@ -48,7 +47,6 @@ export class AppStateService {
   cancel() {
     this.session.delete();
     this._state = AppState.pickNations;
-    this.forget.emit();
     this.stateChanged.emit(AppState.pickNations);
   }
 

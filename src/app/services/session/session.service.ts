@@ -29,7 +29,11 @@ export class SessionService {
   }
 
 
+  /**
+   * Clears local variables and all entries in session storage.
+   */
   delete() {
+    this.nations.setAll();
     this.picked.forEach(nation => {
       nation.armies.forEach(army => sessionStorage.removeItem(army.name));
     });

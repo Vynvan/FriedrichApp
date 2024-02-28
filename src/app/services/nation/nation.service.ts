@@ -23,21 +23,25 @@ export class NationService {
    * Initializes and returns the all nations map.
    */
   getAll(): Map<string, Nation> {
-    if (!this.all) {  
-      let nations = [
-        NationService.initPrussia(),
-        NationService.initHannover(),
-        NationService.initAustria(),
-        NationService.initImperialArmy(),
-        NationService.initRussia(),
-        NationService.initSweden(),
-        NationService.initFrance()
-      ];
-      this.all = new Map<string, Nation>();
-      nations.forEach(n => this.all.set(n.name, n));
-    }
+    if (!this.all)
+      this.setAll();
     return this.all;
   }
+
+  setAll() {
+    let nations = [
+      NationService.initPrussia(),
+      NationService.initHannover(),
+      NationService.initAustria(),
+      NationService.initImperialArmy(),
+      NationService.initRussia(),
+      NationService.initSweden(),
+      NationService.initFrance()
+    ];
+    this.all = new Map<string, Nation>();
+    nations.forEach(n => this.all.set(n.name, n));
+}
+
 
   private static initAustria(): Nation {
     return {

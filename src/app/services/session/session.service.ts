@@ -33,6 +33,7 @@ export class SessionService {
     this.picked.forEach(nation => {
       nation.armies.forEach(army => sessionStorage.removeItem(army.name));
     });
+    this.picked = [];
     sessionStorage.removeItem('active');
     sessionStorage.removeItem('nations');
     sessionStorage.removeItem('state');

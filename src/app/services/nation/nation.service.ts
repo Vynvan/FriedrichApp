@@ -1,50 +1,43 @@
 import { Injectable } from '@angular/core';
 
-import { Nation, Nation$ } from '@services/model';
-import { SessionService } from '@app/services/session/session.service';
+import { Nation } from '@services/model';
 
 
+
+/**
+ * Creates a map of all nations containing all nation related data and all generals.
+ * All nation data is hard-coded in here.
+ */
 @Injectable({
   providedIn: 'root'
 })
 export class NationService {
 
-  all: Map<string, Nation>;
+  private all!: Map<string, Nation>;
 
   
-  private _picked: Nation$[] = [];
-  get picked(): Nation$[] {
-    if (this._picked.length == 0)
-      this.picked = this.session.getPicked(this.all);
-    return this._picked;
-  }
-  set picked(nats: Nation[]) {
-    this._picked = nats.map(nat => {
-      let n = new Nation$(nat);
-      n.updated.subscribe(army => this.session.saveArmy(army.name, army.troops));
-      return n;
-    });
-  }
-
-
+  constructor() { }
+  
+  
   /**
-   * Initializes the all nations map and looksup in the session for picked nations.
-   * @param session 
+   * Initializes and returns the all nations map.
    */
-  constructor(private session: SessionService) {
-    let nations = [
-      NationService.initPrussia(),
-      NationService.initHannover(),
-      NationService.initAustria(),
-      NationService.initImperialArmy(),
-      NationService.initRussia(),
-      NationService.initSweden(),
-      NationService.initFrance()
-    ];
-    this.all = new Map<string, Nation>();
-    nations.forEach(n => this.all.set(n.name, n));
+  getAll(): Map<string, Nation> {
+    if (!this.all) {  
+      let nations = [
+        NationService.initPrussia(),
+        NationService.initHannover(),
+        NationService.initAustria(),
+        NationService.initImperialArmy(),
+        NationService.initRussia(),
+        NationService.initSweden(),
+        NationService.initFrance()
+      ];
+      this.all = new Map<string, Nation>();
+      nations.forEach(n => this.all.set(n.name, n));
+    }
+    return this.all;
   }
-
 
   private static initAustria(): Nation {
     return {

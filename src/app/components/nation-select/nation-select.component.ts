@@ -4,10 +4,11 @@ import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatIconModule } from '@angular/material/icon';
-
-import { NationService } from '@app/services/nation/nation.service';
-import { Nation } from '@app/services/model';
 import { AppStateService } from '@app/services/appState/appState.service';
+
+import { Nation } from '@services/model';
+import { NationService } from '@services/nation/nation.service';
+import { SessionService } from '@services/session/session.service';
 
 @Component({
   selector: 'app-nation-select',
@@ -24,16 +25,18 @@ import { AppStateService } from '@app/services/appState/appState.service';
 })
 export class NationSelectComponent {
   
+  private all: Map<string, Nation>;
   picked: any;
   
   get nations(): IterableIterator<Nation> {
-    return this.nationService.all.values();
+    return this.all.values();
   }
 
 
-  constructor(private nationService: NationService, private appState: AppStateService) {
+  constructor(nations: NationService, private session: SessionService, private state: AppStateService) {
+    this.all = nations.getAll();
     this.picked = {};
-    this.nationService.all.forEach(nation => {
+    this.all.forEach(nation => {
       this.picked[nation.name] = false;
     });
   }
@@ -53,17 +56,15 @@ export class NationSelectComponent {
    * be informed that this stage is completed.
    */
   onSubmit(): void {
-    let i = 0;
     let p: Nation[] = [];
-    this.nationService.all.forEach(nation => {
+    this.all.forEach(nation => {
       if (this.picked[nation.name] == true) {
-        i++;
         p.push(nation);
       }
     });
-    if (i >= 1) {
-      this.nationService.picked = p;
-      this.appState.stateCompleted();
+    if (p.length >= 1) {
+      this.session.pickNations(p);
+      this.state.stateCompleted();
     }
   }
 }

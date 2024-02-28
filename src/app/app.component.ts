@@ -4,7 +4,6 @@ import { Router, RouterOutlet } from '@angular/router';
 
 import { SessionService } from '@app/services/session/session.service';
 import { AppStateService, AppState } from '@services/appState/appState.service';
-import { NationService } from '@services/nation/nation.service';
 
 
 @Component({
@@ -22,7 +21,7 @@ export class AppComponent {
   title = 'FriedrichApp';
 
 
-  constructor(private appState: AppStateService, private nations: NationService, private router: Router, private session: SessionService) {
+  constructor(private appState: AppStateService, private router: Router, private session: SessionService) {
     this.appState.stateChanged.subscribe(next => this.computeState(next));
     this.computeState();
   }
@@ -43,11 +42,11 @@ export class AppComponent {
         break;
       }
       case(AppState.distributeTroops): {
-        this.router.navigate(['DistributeTroops', active ?? this.nations.picked[0].name]);
+        this.router.navigate(['DistributeTroops', active ?? this.session.pickedNations[0].name]);
         break;
       }
       case(AppState.inGame): {
-        
+
       }
     }
   }

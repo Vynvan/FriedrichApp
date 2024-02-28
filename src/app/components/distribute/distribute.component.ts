@@ -3,15 +3,15 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { Observable, Subscription, combineLatest, map } from 'rxjs';
 import { MatButtonModule } from '@angular/material/button';
-import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
+import {MatDialog} from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 
 import { ArmyComponent } from "@components/army/army.component";
-import { CancelDialogComponent } from '@dialogs/cancel/cancel-dialog.component';
 import { NationComponent } from '@components/nation/nation.component';
 import { NavComponent } from '@components/nav/nav.component';
+import { CancelDialogComponent } from '@dialogs/cancel/cancel-dialog.component';
 import { AppStateService } from '@services/appState/appState.service';
-import { NationService } from '@services/nation/nation.service';
+import { SessionService } from '@services/session/session.service';
 
 
 
@@ -46,33 +46,33 @@ export class DistributeComponent extends NationComponent {
    * Returns this nations index in the NationService.picked array.
    */
   private get index(): number {
-    return this.nations.picked.indexOf(this._nation);
+    return this.session.pickedNations.indexOf(this._nation);
   }
 
   get last(): boolean {
-    return this.index == this.nations.picked.length -1;
+    return this.index == this.session.pickedNations.length -1;
   }
 
   /**
    * Returns true if every nation has maximal troops.
    */
   get ready(): Observable<boolean> {
-    return combineLatest(this.nations.picked.map(n => n.troops$.pipe(map(tr => tr == n.maxTroops))))
+    return combineLatest(this.session.pickedNations.map(n => n.troops$.pipe(map(tr => tr == n.maxTroops))))
       .pipe(map(trps => trps.every(ready => ready)));
   }
 
 
-  constructor(nations: NationService, private dialog: MatDialog, private router: Router, private state: AppStateService) {
-    super(nations);
+  constructor(session: SessionService, private dialog: MatDialog, private router: Router, private state: AppStateService) {
+    super(session);
   }
 
 
   nextNation() {
-    this.router.navigate(['DistributeTroops', this.nations.picked[this.index +1].name]);
+    this.router.navigate(['DistributeTroops', this.session.pickedNations[this.index +1].name]);
   }
 
   previousNation() {
-    this.router.navigate(['DistributeTroops', this.nations.picked[this.index -1].name]);
+    this.router.navigate(['DistributeTroops', this.session.pickedNations[this.index -1].name]);
   }
 
   onSubmit() {

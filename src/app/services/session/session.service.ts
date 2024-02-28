@@ -1,25 +1,36 @@
 import { isPlatformBrowser } from '@angular/common';
 import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
 
-import { Nation } from '@services/model';
+import { Nation, Nation$ } from '@services/model';
+import { NationService } from '@services/nation/nation.service';
 
 
 
+/**
+ * Serves all session realated data like the picked nations and army sizes. The data is retrieved from the corresponding services OR the sessionStorage.
+ */
 @Injectable({
   providedIn: 'root'
 })
 export class SessionService {
 
   private isBrowser: boolean;
+  private picked: Nation$[] = [];
+
+  get pickedNations(): Nation$[] {
+    if (this.picked.length == 0)
+      this.pickNations(this.getPicked());
+    return this.picked;
+  }
 
 
-  constructor(@Inject(PLATFORM_ID) platformId: Object) {
+  constructor(@Inject(PLATFORM_ID) platformId: Object, private nations: NationService) {
     this.isBrowser = isPlatformBrowser(platformId);
   }
 
 
-  delete(picked: Nation[]) {
-    picked.forEach(nation => {
+  delete() {
+    this.picked.forEach(nation => {
       nation.armies.forEach(army => sessionStorage.removeItem(army.name));
     });
     sessionStorage.removeItem('active');
@@ -40,11 +51,12 @@ export class SessionService {
    * @param all The all nations map of the NationService
    * @returns The picked nations according to session or []
    */
-  getPicked(all: Map<string, Nation>): Nation[] {
+  getPicked(): Nation[] {
     let picked: Nation[] = [];
     if (this.isBrowser) {
       let nationsStr = sessionStorage.getItem('nations');
       if (nationsStr) {
+        let all = this.nations.getAll();
         let nationNames = nationsStr.split(';');
         nationNames.forEach(name => {
           let nation = all.get(name);
@@ -72,6 +84,15 @@ export class SessionService {
       return Number(sessionStorage.getItem('state') ?? 0);
     }
     return 0;
+  }
+
+  pickNations(nations: Nation[]) {
+    this.picked = nations.map(nat => {
+      let n = new Nation$(nat);
+      n.updated.subscribe(army => this.saveArmy(army.name, army.troops));
+      return n;
+    });
+    this
   }
 
   saveActive(name: string) {

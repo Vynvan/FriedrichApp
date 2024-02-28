@@ -5,7 +5,7 @@ import { combineLatest, map, Observable, Subscription } from 'rxjs';
 import { ArmyComponent } from "@components/army/army.component";
 import { NavComponent } from '@components/nav/nav.component';
 import { Army, Nation$ } from '@services/model';
-import { NationService } from '@services/nation/nation.service';
+import { SessionService } from '@services/session/session.service';
 
 
 
@@ -32,7 +32,7 @@ export class NationComponent {
 
   @Input()
   set nationName(name: string) {
-    this._nation = this.nations.picked.find(nation => nation.name === name) ?? this.nations.picked[0];
+    this._nation = this.session.pickedNations.find(nation => nation.name === name) ?? this.session.pickedNations[0];
   }
   get nationName(): string {
     return this._nation.name;
@@ -59,7 +59,7 @@ export class NationComponent {
   }
 
 
-  constructor(protected nations: NationService) {  }
+  constructor(protected session: SessionService) {  }
 
 
   /**

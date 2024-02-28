@@ -5,9 +5,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 
-import { SessionService } from '@app/services/session/session.service';
 import { AppState, AppStateService } from '@services/appState/appState.service';
-import { NationService } from '@services/nation/nation.service';
+import { SessionService } from '@services/session/session.service';
 
 
 
@@ -39,7 +38,7 @@ export class NavComponent {
   }
   
   get nationNames(): string[] {
-    return this.nations.picked.map(nat => nat.name);
+    return this.session.pickedNations.map(nat => nat.name);
   }
 
   get parent(): string {
@@ -52,7 +51,7 @@ export class NavComponent {
   }
 
 
-  constructor(private nations: NationService, private session: SessionService, private state: AppStateService) {}
+  constructor(private session: SessionService, private state: AppStateService) {}
 
 
   navigateTo(nationName: string): string {

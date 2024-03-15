@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { combineLatest, map, Observable, Subscription } from 'rxjs';
+import { BehaviorSubject, combineLatest, map, Observable, Subscription } from 'rxjs';
 
 import { ArmyComponent } from "@components/army/army.component";
 import { NavComponent } from '@components/nav/nav.component';
@@ -27,8 +27,10 @@ import { SessionService } from '@services/session/session.service';
 })
 export class NationComponent {
 
+  private _editMode = new BehaviorSubject<boolean>(false);
   protected _nation!: Nation$;
   private paramSub?: Subscription;
+
 
   @Input()
   set nationName(name: string) {
@@ -38,8 +40,13 @@ export class NationComponent {
     return this._nation.name;
   }
   
+  
   get armies$(): Observable<Army[]> {
     return combineLatest(this._nation.armies$);
+  }
+
+  get editMode$(): Observable<boolean> {
+    return this._editMode.asObservable();
   }
 
   get maxTroops(): number {

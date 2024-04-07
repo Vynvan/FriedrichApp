@@ -42,11 +42,12 @@ export class AppComponent {
         break;
       }
       case(AppState.distributeTroops): {
-        this.router.navigate(['DistributeTroops', active ?? this.session.pickedNations[0].name]);
+        this.router.navigate([active ?? this.session.pickedNations[0].name, 'Distribute']);
         break;
       }
       case(AppState.inGame): {
-
+        this.router.navigate([active ?? this.session.pickedNations[0].name]);
+        break;
       }
     }
   }

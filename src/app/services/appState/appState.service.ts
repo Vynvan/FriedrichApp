@@ -59,15 +59,15 @@ export class AppStateService {
         // If every army of every picked nation is at maxTroops (like sweden or imperialArmy), the distributeTroops phase is skipped.
         let next = this.session.pickedNations.every(nation => nation.armies.every(army => army.troops == nation.maxTroops))
         ? AppState.inGame : AppState.distributeTroops;
-        // console.log("State completed: pickNations");
-        this.state = next;
+        this._state = next;
         this.session.saveNations(this.session.pickedNations);
-        this.stateChanged.emit(next);
         break;
       }
       case(AppState.distributeTroops): {
-
+        this._state = AppState.inGame;
+        break;
       }
     }
+    this.stateChanged.emit(this._state);
   }
 }

@@ -1,17 +1,12 @@
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, Input } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable, Subscription, combineLatest, map } from 'rxjs';
-import { MatButtonModule } from '@angular/material/button';
-import {MatDialog} from '@angular/material/dialog';
-import { MatIconModule } from '@angular/material/icon';
+import { MatDialog } from '@angular/material/dialog';
 
-import { ArmyComponent } from "@components/army/army.component";
-import { NationComponent } from '@components/nation/nation.component';
-import { NavComponent } from '@components/nav/nav.component';
 import { CancelDialogComponent } from '@dialogs/cancel/cancel-dialog.component';
 import { AppStateService } from '@services/appState/appState.service';
 import { SessionService } from '@services/session/session.service';
+import { Nation$ } from '@app/services/model';
 
 
 
@@ -22,21 +17,20 @@ import { SessionService } from '@services/session/session.service';
  */
 @Component({
     selector: 'app-distribute',
-    standalone: true,
+    standalone: false,
     templateUrl: './distribute.component.html',
     styleUrl: './distribute.component.scss',
-    imports: [
-      ArmyComponent,
-      CommonModule,
-      MatButtonModule,
-      MatIconModule,
-      NavComponent
-    ]
 })
-export class DistributeComponent extends NationComponent {
+export class DistributeComponent {
 
+  private nation!: Nation$;
   private dialogSub?: Subscription;
 
+
+  @Input()
+  set nationName(name: string) {
+    this.nation = this.session.pickedNations.find(nation => nation.name === name) ?? this.session.pickedNations[0];
+  }
 
   get first(): boolean {
     return this.index == 0;
@@ -46,7 +40,7 @@ export class DistributeComponent extends NationComponent {
    * Returns this nations index in the NationService.picked array.
    */
   private get index(): number {
-    return this.session.pickedNations.indexOf(this._nation);
+    return this.session.pickedNations.indexOf(this.nation);
   }
 
   get last(): boolean {
@@ -62,21 +56,19 @@ export class DistributeComponent extends NationComponent {
   }
 
 
-  constructor(session: SessionService, private dialog: MatDialog, private router: Router, private state: AppStateService) {
-    super(session);
-  }
+  constructor(private session: SessionService, private dialog: MatDialog, private router: Router, private state: AppStateService) { }
 
 
   nextNation() {
-    this.router.navigate(['DistributeTroops', this.session.pickedNations[this.index +1].name]);
+    this.router.navigate([this.session.pickedNations[this.index +1].name, 'Distribute']);
   }
 
   previousNation() {
-    this.router.navigate(['DistributeTroops', this.session.pickedNations[this.index -1].name]);
+    this.router.navigate([this.session.pickedNations[this.index -1].name, 'Distribute']);
   }
 
   onSubmit() {
-
+    this.state.stateCompleted();
   }
 
   onCancel() {
@@ -90,8 +82,7 @@ export class DistributeComponent extends NationComponent {
     })
   }
 
-  override ngOnDestroy(): void {
+  ngOnDestroy(): void {
     this.dialogSub?.unsubscribe();
-    super.ngOnDestroy();
   }
 }

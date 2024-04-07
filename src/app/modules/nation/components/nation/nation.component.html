@@ -8,8 +8,11 @@
 </div>
 @for (army of this.armies$ | async; track $index) {
     <app-army [army]="army" 
-        [editMode]="(this.editMode$ | async) ?? false" 
+        [editMode]="this.editMode$" 
         [remaining]="(this.remainingTroops$ | async) ?? 0" 
         (troopsChanged)="updateArmy($event)">
     </app-army>
 }
+<div id="nationChilds">
+    <router-outlet></router-outlet>
+</div>

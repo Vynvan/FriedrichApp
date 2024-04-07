@@ -4,8 +4,6 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 
-import { SessionService } from '@app/services/session/session.service';
-
 
 
 @Component({
@@ -27,14 +25,14 @@ export class CancelDialogComponent {
 
 
   constructor(public dialogRef: MatDialogRef<CancelDialogComponent>, @Inject(MAT_DIALOG_DATA) public data: any) {
-      this.text = `Sind Sie sicher, dass Sie ${(this.data.before) ? this.beforeGame : this.duringGame} verlassen wollen?`;
-    }
+    this.text = `Sind Sie sicher, dass Sie ${(this.data.before) ? this.beforeGame : this.duringGame} verlassen wollen?`;
+  }
 
-    onCancel() {
-      this.dialogRef.close({ cancel: false });
-    }
-  
-    onSubmit() {
-      this.dialogRef.close({ cancel: true });
-    }
+  onCancel() {
+    this.dialogRef.close({ cancel: false });
+  }
+
+  onSubmit() {
+    this.dialogRef.close({ cancel: true });
+  }
 }

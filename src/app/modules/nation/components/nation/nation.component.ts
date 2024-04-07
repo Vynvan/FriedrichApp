@@ -1,11 +1,9 @@
 import { Component, Input } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { BehaviorSubject, combineLatest, map, Observable, Subscription } from 'rxjs';
 
-import { ArmyComponent } from "@components/army/army.component";
-import { NavComponent } from '@components/nav/nav.component';
 import { Army, Nation$ } from '@services/model';
 import { SessionService } from '@services/session/session.service';
+import { AppState, AppStateService } from '@app/services/appState/appState.service';
 
 
 
@@ -16,33 +14,28 @@ import { SessionService } from '@services/session/session.service';
  */
 @Component({
     selector: 'app-distribute',
-    standalone: true,
+    standalone: false,
     templateUrl: './nation.component.html',
     styleUrl: './nation.component.scss',
-    imports: [
-      ArmyComponent,
-      CommonModule,
-      NavComponent
-    ]
 })
 export class NationComponent {
 
   private _editMode = new BehaviorSubject<boolean>(false);
-  protected _nation!: Nation$;
-  private paramSub?: Subscription;
+  private editSub?: Subscription;
+  private nation!: Nation$;
 
 
   @Input()
   set nationName(name: string) {
-    this._nation = this.session.pickedNations.find(nation => nation.name === name) ?? this.session.pickedNations[0];
+    this.nation = this.session.pickedNations.find(nation => nation.name === name) ?? this.session.pickedNations[0];
   }
   get nationName(): string {
-    return this._nation.name;
+    return this.nation.name;
   }
   
   
   get armies$(): Observable<Army[]> {
-    return combineLatest(this._nation.armies$);
+    return combineLatest(this.nation.armies$);
   }
 
   get editMode$(): Observable<boolean> {
@@ -50,23 +43,31 @@ export class NationComponent {
   }
 
   get maxTroops(): number {
-    return this._nation.maxTroops;
+    return this.nation.maxTroops;
   }
 
   get remainingTroops$(): Observable<number> {
-    return combineLatest(this._nation.armies$).pipe(
+    return combineLatest(this.nation.armies$).pipe(
       map(armies => armies.map(a => a.troops)),
       map(armies => armies.reduce((prev, curr) => prev + curr)),
-      map(troops => this._nation.maxTroops - troops)
+      map(troops => this.nation.maxTroops - troops)
     );
   }
 
   get troops$(): Observable<number> {
-    return this._nation.troops$;
+    return this.nation.troops$;
   }
 
 
-  constructor(protected session: SessionService) {  }
+  constructor(private session: SessionService, state: AppStateService) {
+    let initialState = this.session.getState();
+    this._editMode.next(initialState == AppState.distributeTroops);
+    this.editSub = state.stateChanged.subscribe(changed => {
+      let edit = changed == AppState.distributeTroops;
+      console.log(this.nation.name + '/Distribute: EditMode=' + edit);
+      this._editMode.next(edit);
+    });
+  }
 
 
   /**
@@ -74,10 +75,10 @@ export class NationComponent {
    * @param updated 
    */
   updateArmy(updated: Army) {
-    this._nation.updateArmy(updated);
+    this.nation.updateArmy(updated);
   }
 
   ngOnDestroy() {
-    this.paramSub?.unsubscribe();
+    this.editSub?.unsubscribe();
   }
 }

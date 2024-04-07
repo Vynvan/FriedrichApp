@@ -44,9 +44,9 @@ export class NavComponent {
   get parent(): string {
     switch(this.state.state) {
       case AppState.distributeTroops:
-        return "DistributeTroops";
+        return 'Distribute';
       default:
-        return "";
+        return '';
     }
   }
 
@@ -55,6 +55,10 @@ export class NavComponent {
 
 
   navigateTo(nationName: string): string {
-    return `/${ this.parent }/${ nationName }`;
+    let to = `/${ nationName }`;
+    if (this.parent) {
+      to + '/' + this.parent;
+    }
+    return to;
   }
 }

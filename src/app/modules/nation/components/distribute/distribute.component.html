@@ -1,17 +1,3 @@
-<app-nav [activeNation]="(this.nationName)"></app-nav>
-<div class="nationHeader">
-    <title>{{ this.nationName }}</title>
-    <div>
-        <span>Total troops: </span>
-        <span>{{ this.troops$ | async }} / {{ this.maxTroops }}</span>
-    </div>
-</div>
-<!-- @for (army$ of this.armiesMax$; track $index) {
-    <app-army [armyMax$]="army$" [editMode]="true" (troopsChanged)="updateArmy($event)"></app-army>
-} -->
-@for (army of this.armies$ | async; track $index) {
-    <app-army [army]="army" [editMode]="true" [remaining]="(this.remainingTroops$ | async) ?? 0" (troopsChanged)="this.updateArmy($event)"></app-army>
-}
 <div id="distributeButtons">
     <button mat-fab id="cancelButton" (click)="this.onCancel()">
         <mat-icon>close</mat-icon>

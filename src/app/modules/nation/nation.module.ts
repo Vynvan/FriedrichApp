@@ -1,5 +1,5 @@
-import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { NgModule } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 
 import { MatButtonModule } from '@angular/material/button';
@@ -11,12 +11,14 @@ import { ArmyComponent } from './components/army/army.component';
 import { DistributeComponent } from './components/distribute/distribute.component';
 import { NationComponent } from './components/nation/nation.component';
 import { NationRoutingModule } from './nation-routing.module';
+import { IngameComponent } from './components/ingame/ingame.component';
 
 
 @NgModule({
   declarations: [
     ArmyComponent,
     DistributeComponent,
+    IngameComponent,
     NationComponent
   ],
   imports: [

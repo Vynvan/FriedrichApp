@@ -3,7 +3,7 @@ import { BehaviorSubject, combineLatest, map, Observable, Subscription } from 'r
 
 import { Army, Nation$ } from '@services/model';
 import { SessionService } from '@services/session/session.service';
-import { AppState, AppStateService } from '@app/services/appState/appState.service';
+import { AppState, AppStateService } from '@services/appState/appState.service';
 
 
 

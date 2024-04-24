@@ -67,10 +67,6 @@ export class DistributeComponent {
     this.router.navigate([this.session.pickedNations[this.index -1].name, 'Distribute']);
   }
 
-  onSubmit() {
-    this.state.stateCompleted();
-  }
-
   onCancel() {
     let dialogRef = this.dialog.open(CancelDialogComponent, {
       data: { before: true }
@@ -79,7 +75,11 @@ export class DistributeComponent {
       if (result?.cancel) {
         this.state.cancel();
       }
-    })
+    });
+  }
+
+  onSubmit() {
+    this.state.stateCompleted();
   }
 
   ngOnDestroy(): void {

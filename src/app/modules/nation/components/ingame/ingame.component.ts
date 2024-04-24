@@ -1,5 +1,10 @@
 import { Component } from '@angular/core';
 
+import { SessionService } from '@app/services/session/session.service';
+import { HideTroopsService } from '../../services/hide-troops.service';
+
+
+
 @Component({
   selector: 'app-ingame',
   standalone: false,
@@ -8,4 +13,24 @@ import { Component } from '@angular/core';
 })
 export class IngameComponent {
 
+  hidden: boolean = false;
+
+
+  constructor(session: SessionService, private hide: HideTroopsService) {
+    this.hidden = session.getHiddenState();
+    this.hide.hidden$.subscribe(value => this.hidden = value);
+  }
+
+
+  hideArmies() {
+    this.hide.changeHidden(true);
+  }
+
+  showArmies() {
+    this.hide.changeHidden(false);
+  }
+
+  startBattle() {
+
+  }
 }

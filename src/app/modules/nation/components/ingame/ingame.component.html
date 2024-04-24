@@ -1,1 +1,15 @@
-<p>ingame works!</p>
+<div id="ingameButtons">
+    <button mat-fab id="battleButton" (click)="this.startBattle()">
+        <mat-icon>close</mat-icon>
+    </button>
+    @if (this.hidden) {
+        <button mat-fab id="showButton" (click)="this.showArmies()">
+            <mat-icon>visibility</mat-icon>
+        </button>
+    }
+    @else {
+        <button mat-fab id="hideButton" (click)="this.hideArmies()">
+            <mat-icon>visibility_off</mat-icon>
+        </button>
+    }
+</div>

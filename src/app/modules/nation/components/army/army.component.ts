@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, numbe
 import { Observable, ReplaySubject, Subscription } from 'rxjs';
 
 import { Army, dummy } from '@app/services/model';
+import { HideTroopsService } from '../../services/hide-troops.service';
 
 
 
@@ -42,8 +43,12 @@ export class ArmyComponent implements OnChanges {
     return this.troopsSubj.asObservable();
   }
 
+  troopVisibility = 'hidden';
 
-  constructor() { }
+  
+  constructor(hide: HideTroopsService) {
+    hide.hidden$.subscribe(value => this.troopVisibility = value ? 'hidden' : 'visible');
+  }
 
 
   ngOnChanges(changes: SimpleChanges): void {

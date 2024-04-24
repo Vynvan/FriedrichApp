@@ -3,6 +3,7 @@ import { Injectable, EventEmitter } from '@angular/core';
 import { SessionService } from '@app/services/session/session.service';
 
 
+
 export enum AppState {
   pickNations,
   distributeTroops,
@@ -45,9 +46,11 @@ export class AppStateService {
    * Resets the app to start all over.
    */
   cancel() {
-    this.session.delete();
-    this._state = AppState.pickNations;
-    this.stateChanged.emit(AppState.pickNations);
+    if (this.state == AppState.distributeTroops) {
+      this.session.delete();
+      this._state = AppState.pickNations;
+      this.stateChanged.emit(AppState.pickNations);
+    }
   }
 
   /**

@@ -50,6 +50,13 @@ export class SessionService {
     return null;
   }
 
+  getHiddenState(): boolean {
+    if (this.isBrowser) {
+      return Boolean(sessionStorage.getItem('hidden'));
+    }
+    return false;
+  }
+
   /**
    * Takes the all nations map and picks the players picked nations that are saved in the session.
    * This is supposed to only get called by the nationService.
@@ -106,6 +113,10 @@ export class SessionService {
 
   saveArmy(name: string, troops: number) {
     sessionStorage.setItem(name, troops.toString());
+  }
+
+  saveHiddenState(value: boolean) {
+    sessionStorage.setItem('hidden', String(value));
   }
 
   saveNations(nations: Nation[]) {

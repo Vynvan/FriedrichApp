@@ -22,6 +22,10 @@ export class IngameComponent {
   }
 
 
+  buyTroops() {
+    
+  }
+
   hideArmies() {
     this.hide.changeHidden(true);
   }

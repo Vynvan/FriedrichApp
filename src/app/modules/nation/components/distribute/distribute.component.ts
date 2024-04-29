@@ -4,9 +4,9 @@ import { Observable, Subscription, combineLatest, map } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 
 import { CancelDialogComponent } from '@dialogs/cancel/cancel-dialog.component';
-import { AppStateService } from '@services/appState/appState.service';
+import { AppState, AppStateService } from '@services/appState/appState.service';
 import { SessionService } from '@services/session/session.service';
-import { Nation$ } from '@app/services/model';
+import { Nation$ } from '@services/model';
 
 
 
@@ -23,8 +23,8 @@ import { Nation$ } from '@app/services/model';
 })
 export class DistributeComponent {
 
-  private nation!: Nation$;
   private dialogSub?: Subscription;
+  private nation!: Nation$;
 
 
   @Input()
@@ -33,7 +33,7 @@ export class DistributeComponent {
   }
 
   get first(): boolean {
-    return this.index == 0;
+    return this.index === 0;
   }
 
   /**
@@ -79,7 +79,9 @@ export class DistributeComponent {
   }
 
   onSubmit() {
-    this.state.stateCompleted();
+    if (this.state.state == AppState.distributeTroops) {
+      this.state.stateCompleted();
+    }
   }
 
   ngOnDestroy(): void {

@@ -1,6 +1,9 @@
 <div id="ingameButtons">
     <button mat-fab id="battleButton" (click)="this.startBattle()">
-        <mat-icon>close</mat-icon>
+        <span class="material-symbols-outlined">swords</span>
+    </button>
+    <button mat-fab id="buyButton" (click)="this.buyTroops()">
+        <mat-icon>person_add</mat-icon>
     </button>
     @if (this.hidden) {
         <button mat-fab id="showButton" (click)="this.showArmies()">

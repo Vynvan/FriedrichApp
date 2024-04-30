@@ -17,6 +17,8 @@ export class ArmyComponent implements OnChanges {
   private _edit = false;
   private editSub?: Subscription;
   private troopsSubj = new ReplaySubject<[number, boolean][]>(1);
+  troopVisibility = 'hidden';
+
 
   @Input({ required: true })
   army: Army = dummy;
@@ -35,15 +37,12 @@ export class ArmyComponent implements OnChanges {
     });
   }
 
-
   @Output() troopsChanged = new EventEmitter<Army>();
 
 
   get troopStates$(): Observable<[number, boolean][]> {
     return this.troopsSubj.asObservable();
   }
-
-  troopVisibility = 'hidden';
 
   
   constructor(hide: HideTroopsService) {

@@ -9,9 +9,10 @@ import { MatIconModule } from '@angular/material/icon';
 import { NavComponent } from '@components/nav/nav.component';
 import { ArmyComponent } from './components/army/army.component';
 import { DistributeComponent } from './components/distribute/distribute.component';
+import { IngameComponent } from './components/ingame/ingame.component';
 import { NationComponent } from './components/nation/nation.component';
 import { NationRoutingModule } from './nation-routing.module';
-import { IngameComponent } from './components/ingame/ingame.component';
+import { RedistributeComponent } from './components/redistribute/redistribute.component';
 
 
 @NgModule({
@@ -19,7 +20,8 @@ import { IngameComponent } from './components/ingame/ingame.component';
     ArmyComponent,
     DistributeComponent,
     IngameComponent,
-    NationComponent
+    NationComponent,
+    RedistributeComponent
   ],
   imports: [
     CommonModule,

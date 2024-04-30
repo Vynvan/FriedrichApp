@@ -28,8 +28,6 @@ export interface Nation {
 
 
 export class Nation$ implements Nation {
-
-
     armies: Army[];
     armies$: Observable<Army>[];
     maxTroops: number;
@@ -60,10 +58,10 @@ export class Nation$ implements Nation {
 
     updateArmy(army: Army): void {
         const i = this.armies.findIndex(a => a.name === army.name);
-        if (i != -1) {
+        if (i != -1 && this.armies[i].troops != army.troops) {
             this.armies[i] = army;
+            this._subjects.get(army.name)?.next(army);
+            this.updated.emit(army);
         }
-        this._subjects.get(army.name)?.next(army);
-        this.updated.emit(army);
     }
 }

@@ -7,7 +7,8 @@ import { IngameComponent } from './components/ingame/ingame.component';
 const routes: Routes = [
   { path: '', component: NationComponent, children: [
     { path: '', component: IngameComponent },
-    { path: 'Distribute', component: DistributeComponent }
+    { path: 'Distribute', component: DistributeComponent },
+    { path: 'Redistribute', component: DistributeComponent }
   ] }
 ];
 

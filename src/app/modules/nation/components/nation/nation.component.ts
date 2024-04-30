@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnDestroy } from '@angular/core';
 import { BehaviorSubject, combineLatest, map, Observable, Subscription } from 'rxjs';
 
 import { Army, Nation$ } from '@services/model';
@@ -18,7 +18,7 @@ import { AppState, AppStateService } from '@services/appState/appState.service';
     templateUrl: './nation.component.html',
     styleUrl: './nation.component.scss',
 })
-export class NationComponent {
+export class NationComponent implements OnDestroy {
 
   private _editMode = new BehaviorSubject<boolean>(false);
   private editSub?: Subscription;
@@ -47,11 +47,7 @@ export class NationComponent {
   }
 
   get remainingTroops$(): Observable<number> {
-    return combineLatest(this.nation.armies$).pipe(
-      map(armies => armies.map(a => a.troops)),
-      map(armies => armies.reduce((prev, curr) => prev + curr)),
-      map(troops => this.nation.maxTroops - troops)
-    );
+    return this.nation.troops$.pipe(map(troops => this.nation.maxTroops - troops));
   }
 
   get troops$(): Observable<number> {
@@ -60,13 +56,9 @@ export class NationComponent {
 
 
   constructor(private session: SessionService, state: AppStateService) {
-    let initialState = this.session.getState();
-    this._editMode.next(initialState == AppState.distributeTroops);
-    this.editSub = state.stateChanged.subscribe(changed => {
-      let edit = changed == AppState.distributeTroops;
-      console.log(this.nation.name + '/Distribute: EditMode=' + edit);
-      this._editMode.next(edit);
-    });
+    const initialState = this.session.getState();
+    this.updateEditMode(initialState);
+    this.editSub = state.stateChanged.subscribe(changed => this.updateEditMode(changed));
   }
 
 
@@ -76,6 +68,14 @@ export class NationComponent {
    */
   updateArmy(updated: Army) {
     this.nation.updateArmy(updated);
+  }
+
+  updateEditMode(value: AppState) {
+    if ([AppState.distributeTroops, AppState.battle, AppState.buyTroops].includes(value)) {
+      console.log(this.nation.name + ': EditMode=true');
+      this._editMode.next(true);
+    }
+    else if (value == AppState.inGame) this._editMode.next(false);
   }
 
   ngOnDestroy() {

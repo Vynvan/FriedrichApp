@@ -1,6 +1,6 @@
 import { Injectable, EventEmitter } from '@angular/core';
 
-import { SessionService } from '@app/services/session/session.service';
+import { SessionService } from '@services/session/session.service';
 
 
 
@@ -8,7 +8,7 @@ export enum AppState {
   pickNations,
   distributeTroops,
   inGame,
-  fight,
+  battle,
   buyTroops,
   afterGame
 }
@@ -29,9 +29,6 @@ export class AppStateService {
   get state(): AppState {
     return this._state;
   }
-  private set state(st: AppState) {
-    this._state = st;
-  }
 
   stateChanged = new EventEmitter<AppState>();
 
@@ -46,7 +43,7 @@ export class AppStateService {
    * Resets the app to start all over.
    */
   cancel() {
-    if (this.state == AppState.distributeTroops) {
+    if (this._state == AppState.distributeTroops) {
       this.session.delete();
       this._state = AppState.pickNations;
       this.stateChanged.emit(AppState.pickNations);
@@ -60,15 +57,14 @@ export class AppStateService {
     switch(this._state) {
       case (AppState.pickNations): {
         // If every army of every picked nation is at maxTroops (like sweden or imperialArmy), the distributeTroops phase is skipped.
-        let next = this.session.pickedNations.every(nation => nation.armies.every(army => army.troops == nation.maxTroops))
+        const next = this.session.pickedNations.every(nation => nation.armies.every(army => army.troops == nation.maxTroops))
         ? AppState.inGame : AppState.distributeTroops;
         this._state = next;
         this.session.saveNations(this.session.pickedNations);
         break;
       }
-      case(AppState.distributeTroops): {
+      default: {
         this._state = AppState.inGame;
-        break;
       }
     }
     this.stateChanged.emit(this._state);

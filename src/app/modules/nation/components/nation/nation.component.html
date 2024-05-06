@@ -10,7 +10,7 @@
     <app-army [army]="army" 
         [editMode]="this.editMode$" 
         [remaining]="(this.remainingTroops$ | async) ?? 0" 
-        (troopsChanged)="updateArmy($event)">
+        (troopsChanged)="this.updateArmy($event)">
     </app-army>
 }
 <div id="nationChilds">

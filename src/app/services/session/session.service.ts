@@ -1,8 +1,9 @@
 import { isPlatformBrowser } from '@angular/common';
-import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
+import { Injectable, Inject, PLATFORM_ID, OnDestroy } from '@angular/core';
 
 import { Nation, Nation$ } from '@services/model';
 import { NationService } from '@services/nation/nation.service';
+import { Subscription } from 'rxjs';
 
 
 
@@ -12,10 +13,11 @@ import { NationService } from '@services/nation/nation.service';
 @Injectable({
   providedIn: 'root'
 })
-export class SessionService {
+export class SessionService implements OnDestroy {
 
   private isBrowser: boolean;
   private picked: Nation$[] = [];
+  private subs: Subscription[] = [];
 
   get pickedNations(): Nation$[] {
     if (this.picked.length == 0)
@@ -27,7 +29,6 @@ export class SessionService {
   constructor(@Inject(PLATFORM_ID) platformId: Object, private nations: NationService) {
     this.isBrowser = isPlatformBrowser(platformId);
   }
-
 
   /**
    * Clears local variables and all entries in session storage.
@@ -80,10 +81,10 @@ export class SessionService {
   getPicked(): Nation[] {
     let picked: Nation[] = [];
     if (this.isBrowser) {
-      let nationsStr = sessionStorage.getItem('nations');
+      const nationsStr = sessionStorage.getItem('nations');
       if (nationsStr) {
-        let all = this.nations.getAll();
-        let nationNames = nationsStr.split(';');
+        const all = this.nations.getAll();
+        const nationNames = nationsStr.split(';');
         nationNames.forEach(name => {
           let nation = all.get(name);
           if (nation) {
@@ -112,25 +113,33 @@ export class SessionService {
     return 0;
   }
 
+  ngOnDestroy(): void {
+    this.subs.forEach(sub => sub.unsubscribe());
+  }
+
   pickNations(nations: Nation[]) {
     this.picked = nations.map(nat => {
-      let n = new Nation$(nat);
-      n.updated.subscribe(army => this.saveArmy(army.name, army.troops));
+      const n = new Nation$(nat);
+      const sub = n.updated$.subscribe(army => this.saveArmy(army.name, army.troops));
+      this.subs.push(sub);
       return n;
     });
-    this
+    console.log(this.subs.length);
   }
 
   saveActive(name: string) {
-    sessionStorage.setItem('active', name);
+    if (this.isBrowser)
+      sessionStorage.setItem('active', name);
   }
 
   saveArmy(name: string, troops: number) {
-    sessionStorage.setItem(name, troops.toString());
+    if (this.isBrowser)
+      sessionStorage.setItem(name, troops.toString());
   }
 
   saveHiddenState(value: boolean) {
-    sessionStorage.setItem('hidden', String(value));
+    if (this.isBrowser)
+      sessionStorage.setItem('hidden', String(value));
   }
 
   saveNations(nations: Nation[]) {
@@ -140,6 +149,7 @@ export class SessionService {
   }
 
   saveState(state: number) {
-    sessionStorage.setItem('state', state.toString());
+    if (this.isBrowser)
+      sessionStorage.setItem('state', state.toString());
   }
 }

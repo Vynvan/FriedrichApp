@@ -11,16 +11,17 @@ import { SessionService } from '@services/session/session.service';
 })
 export class RestoreService {
 
-  private _armiesSubs: Subscription[] = [];
-  private _beforeRestore?: Army[];
-  private _restorePoint = new Map<string, number>();
+  private armySub?: Subscription;
+  private beforeRestore?: Army[];
+  private restorePoint = new Map<string, number>();
+
 
   constructor(private session: SessionService) { }
 
 
   delete() {
-    this._restorePoint = new Map<string, number>();
-    this._armiesSubs.forEach(sub => sub.unsubscribe());
+    this.restorePoint = new Map<string, number>();
+    this.armySub?.unsubscribe();
   }
 
   /**
@@ -28,15 +29,15 @@ export class RestoreService {
    * the army in the beforeRestore array.
    */
   restore() {
+    this.armySub?.unsubscribe();
     const activeNation = this.session.getActiveNation();
     console.log('Restoring ' + activeNation?.name + '...');
-    console.log(this._beforeRestore?.length + ' before entries.');
-    console.log(this._restorePoint.size + ' restorePoint entries.');
+    console.log(`${this.beforeRestore?.length} before-entries, ${this.restorePoint.size} restorePoint-entries.`);
     if (activeNation) {
-      this._restorePoint.forEach((_, name) => {
-        const army = this._beforeRestore?.find(a => a.name == name);
+      this.restorePoint.forEach((_, name) => {
+        const army = this.beforeRestore?.find(a => a.name === name);
         if (army)
-          activeNation?.updateArmy(army);
+          activeNation.updateArmy(army);
         console.log('Restored', army?.name, ' from', activeNation);
       });
     }
@@ -48,16 +49,25 @@ export class RestoreService {
   set() {
     const activeNation = this.session.getActiveNation();
     if (activeNation) {
-      this._beforeRestore = activeNation.armies;
-      activeNation.armies$.forEach(obs => this._armiesSubs.push(obs.subscribe(army => {
-        const before = this._beforeRestore!.find(bef => bef.name == army.name);
-        if (before?.troops != army.troops) {
-          if (this._restorePoint.has(army.name))
-            this._restorePoint.delete(army.name);
-          this._restorePoint.set(army.name, army.troops);
+      this.beforeRestore = activeNation.armies;
+      this.armySub = activeNation.updated$.subscribe(army => {
+        const before = this.beforeRestore?.find(ba => ba.name === army.name);
+        console.log(`Set restore point for ${army.name} from ${before?.troops} to ${army.troops}.`)
+        if (before && before.troops != army.troops) {
+          if (this.restorePoint.has(army.name))
+            this.restorePoint.delete(army.name);
+          this.restorePoint.set(army.name, army.troops);
         }
-        console.log(`Restore ${before ? 'found' : 'found no'} army: ${army.name}`);
-      })));
+      });
+      // activeNation.armies$.forEach(obs => this._armiesSubs.push(obs.subscribe(army => {
+      //   const before = this._beforeRestore!.find(bef => bef.name == army.name);
+      //   if (before?.troops != army.troops) {
+      //     if (this._restorePoint.has(army.name))
+      //       this._restorePoint.delete(army.name);
+      //     this._restorePoint.set(army.name, army.troops);
+      //   }
+      //   console.log(`Restore ${before ? 'found' : 'found no'} army: ${army.name}`);
+      // })));
     }
   }
 }

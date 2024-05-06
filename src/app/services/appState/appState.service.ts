@@ -51,11 +51,9 @@ export class AppStateService implements OnDestroy {
    * Resets the app to start all over.
    */
   cancel() {
-    if (this._state == AppState.distributeTroops) {
-      this.session.delete();
-      this._state = AppState.pickNations;
-      this.stateChanged.emit(AppState.pickNations);
-    }
+    this.session.delete();
+    this._state = AppState.pickNations;
+    this.stateChanged.emit(AppState.pickNations);
   }
 
   goto(state: AppState) {
@@ -78,15 +76,9 @@ export class AppStateService implements OnDestroy {
         this.session.saveNations(this.session.pickedNations);
         break;
       }
-      case (AppState.buyTroops): {
+      default: {
         this.restore.delete();
         this._state = AppState.inGame;
-        break;
-      }
-      case (AppState.battle): {
-        this.restore.delete();
-        this._state = AppState.inGame;
-        break;
       }
     }
     this.stateChanged.emit(this._state);

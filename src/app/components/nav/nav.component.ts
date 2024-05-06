@@ -41,23 +41,23 @@ export class NavComponent {
     return this.session.pickedNations.map(nat => nat.name);
   }
 
-  get parent(): string {
-    switch(this.state.state) {
-      case AppState.distributeTroops:
-        return 'Distribute';
-      default:
-        return '';
-    }
-  }
-
 
   constructor(private session: SessionService, private state: AppStateService) {}
 
 
+  endGame() {
+    this.state.cancel();
+  }
+
   navigateTo(nationName: string): string {
-    let to = `/${ nationName }`;
-    if (this.parent) {
-      to + '/' + this.parent;
+    const to = `/${ nationName }`;
+    switch(this.state.state) {
+      case AppState.battle:
+        return to + '/Battle';
+      case AppState.buyTroops:
+        return to + '/BuyTroops';
+      case AppState.distributeTroops:
+        return to + '/Distribute';
     }
     return to;
   }

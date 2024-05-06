@@ -45,9 +45,23 @@ export class SessionService {
 
   getActive(): string | null {
     if (this.isBrowser) {
-      return sessionStorage.getItem('active');
+      let active = sessionStorage.getItem('active');
+      if (!active && this.picked.length > 0)
+        active = this.picked[0].name;
+      return active;
     }
     return null;
+  }
+
+  getActiveNation(): Nation$ | undefined {
+    if (this.isBrowser) {
+      const name = this.getActive();
+      if (name)
+        return this.pickedNations.find(n => n.name === name)
+      else if (this.pickedNations.length > 0)
+        return this.picked[0];
+    }
+    return undefined;
   }
 
   getHiddenState(): boolean {

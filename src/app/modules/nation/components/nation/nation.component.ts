@@ -70,15 +70,16 @@ export class NationComponent implements OnDestroy {
     this.nation.updateArmy(updated);
   }
 
-  updateEditMode(value: AppState) {
-    if ([AppState.distributeTroops, AppState.battle, AppState.buyTroops].includes(value)) {
-      console.log(this.nation.name + ': EditMode=true');
-      this._editMode.next(true);
-    }
-    else if (value == AppState.inGame) this._editMode.next(false);
-  }
-
   ngOnDestroy() {
     this.editSub?.unsubscribe();
+  }
+
+  private updateEditMode(value: AppState) {
+    if ([AppState.distributeTroops, AppState.battle, AppState.buyTroops].includes(value)) {
+      console.log(this.nation?.name + ': EditMode=true');
+      this._editMode.next(true);
+    }
+    else if (value == AppState.inGame)
+      this._editMode.next(false);
   }
 }

@@ -35,18 +35,22 @@ export class AppComponent {
     if (!state)
       state = this.appState.state;
     
-    let active = this.session.getActive();
+    const active = this.session.getActive() ?? '';
     switch(state) {
       case(AppState.pickNations): {
         this.router.navigate(['NationSelect']);
         break;
       }
       case(AppState.distributeTroops): {
-        this.router.navigate([active ?? this.session.pickedNations[0].name, 'Distribute']);
+        this.router.navigate([active, 'Distribute']);
         break;
       }
       case(AppState.inGame): {
-        this.router.navigate([active ?? this.session.pickedNations[0].name]);
+        this.router.navigate([active]);
+        break;
+      }
+      case(AppState.buyTroops): {
+        this.router.navigate([active, 'BuyTroops']);
         break;
       }
     }

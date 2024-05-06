@@ -28,11 +28,16 @@ export class RestoreService {
    * the army in the beforeRestore array.
    */
   restore() {
-    const activeNation = this.session.pickedNations.find(n => n.name === this.session.getActive());
+    const activeNation = this.session.getActiveNation();
+    console.log('Restoring ' + activeNation?.name + '...');
+    console.log(this._beforeRestore?.length + ' before entries.');
+    console.log(this._restorePoint.size + ' restorePoint entries.');
     if (activeNation) {
-      this._restorePoint.forEach((troops, name) => {
-        let army = this._beforeRestore?.find(a => a.name == name);
-        if (army) activeNation?.updateArmy(army);
+      this._restorePoint.forEach((_, name) => {
+        const army = this._beforeRestore?.find(a => a.name == name);
+        if (army)
+          activeNation?.updateArmy(army);
+        console.log('Restored', army?.name, ' from', activeNation);
       });
     }
   }
@@ -41,15 +46,17 @@ export class RestoreService {
    * Sets the beforeRestore array and subscribes to all armies$ of the active nation to save changes to them to the restorePoint map.
    */
   set() {
-    const activeNation = this.session.pickedNations.find(n => n.name === this.session.getActive());
+    const activeNation = this.session.getActiveNation();
     if (activeNation) {
       this._beforeRestore = activeNation.armies;
       activeNation.armies$.forEach(obs => this._armiesSubs.push(obs.subscribe(army => {
         const before = this._beforeRestore!.find(bef => bef.name == army.name);
-        if (before && before.troops != army.troops) {
-          if (this._restorePoint.has(army.name)) this._restorePoint.delete(army.name);
+        if (before?.troops != army.troops) {
+          if (this._restorePoint.has(army.name))
+            this._restorePoint.delete(army.name);
           this._restorePoint.set(army.name, army.troops);
         }
+        console.log(`Restore ${before ? 'found' : 'found no'} army: ${army.name}`);
       })));
     }
   }

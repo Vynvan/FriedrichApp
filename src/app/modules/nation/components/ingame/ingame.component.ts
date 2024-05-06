@@ -1,6 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
+import { Subscription } from 'rxjs';
 
-import { SessionService } from '@app/services/session/session.service';
+import { AppState, AppStateService } from '@services/appState/appState.service';
+import { SessionService } from '@services/session/session.service';
 import { HideTroopsService } from '../../services/hide-troops.service';
 
 
@@ -11,19 +13,20 @@ import { HideTroopsService } from '../../services/hide-troops.service';
   templateUrl: './ingame.component.html',
   styleUrl: './ingame.component.scss'
 })
-export class IngameComponent {
+export class IngameComponent implements OnDestroy {
 
+  private hiddenSub: Subscription;
   hidden: boolean = false;
 
 
-  constructor(session: SessionService, private hide: HideTroopsService) {
+  constructor(session: SessionService, private hide: HideTroopsService, private state: AppStateService) {
     this.hidden = session.getHiddenState();
-    this.hide.hidden$.subscribe(value => this.hidden = value);
+    this.hiddenSub = this.hide.hidden$.subscribe(value => this.hidden = value);
   }
 
 
   buyTroops() {
-    
+    this.state.goto(AppState.buyTroops);
   }
 
   hideArmies() {
@@ -35,6 +38,10 @@ export class IngameComponent {
   }
 
   startBattle() {
+    this.state.goto(AppState.battle);
+  }
 
+  ngOnDestroy() {
+    this.hiddenSub.unsubscribe();
   }
 }

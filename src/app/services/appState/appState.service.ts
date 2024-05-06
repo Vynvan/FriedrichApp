@@ -1,6 +1,8 @@
-import { Injectable, EventEmitter } from '@angular/core';
+import { Injectable, EventEmitter, OnDestroy } from '@angular/core';
+import { RestoreService } from '@app/modules/nation/services/restore.service';
 
 import { SessionService } from '@services/session/session.service';
+import { Subscription } from 'rxjs';
 
 
 
@@ -23,19 +25,25 @@ export enum AppState {
 @Injectable({
   providedIn: 'root'
 })
-export class AppStateService {
+export class AppStateService implements OnDestroy {
 
   private _state: AppState;
+  private _stateSub: Subscription;
+
   get state(): AppState {
     return this._state;
   }
 
-  stateChanged = new EventEmitter<AppState>();
+  stateChanged: EventEmitter<AppState>;
 
 
-  constructor(private session: SessionService) {
+  constructor(private session: SessionService, private restore: RestoreService) {
     this._state = this.session.getState() ?? AppState.pickNations;
-    this.stateChanged.subscribe(next => this.session.saveState(next));
+
+    this.stateChanged = new EventEmitter<AppState>();
+    this._stateSub = this.stateChanged.subscribe(next => {
+      this.session.saveState(next);
+    });
   }
 
 
@@ -48,6 +56,13 @@ export class AppStateService {
       this._state = AppState.pickNations;
       this.stateChanged.emit(AppState.pickNations);
     }
+  }
+
+  goto(state: AppState) {
+    if ([AppState.buyTroops, AppState.battle].includes(state)) {
+      this.restore.set();
+    }
+    this.stateChanged.emit(state);
   }
 
   /**
@@ -63,10 +78,21 @@ export class AppStateService {
         this.session.saveNations(this.session.pickedNations);
         break;
       }
-      default: {
+      case (AppState.buyTroops): {
+        this.restore.delete();
         this._state = AppState.inGame;
+        break;
+      }
+      case (AppState.battle): {
+        this.restore.delete();
+        this._state = AppState.inGame;
+        break;
       }
     }
     this.stateChanged.emit(this._state);
+  }
+
+  ngOnDestroy(): void {
+    this._stateSub.unsubscribe();
   }
 }

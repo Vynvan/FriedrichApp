@@ -1,7 +1,7 @@
-import { Component, OnDestroy } from '@angular/core';
-import { AppState, AppStateService } from '@app/services/appState/appState.service';
+import { Component } from '@angular/core';
+
+import { AppStateService } from '@app/services/appState/appState.service';
 import { RestoreService } from '../../services/restore.service';
-import { Subscription } from 'rxjs';
 
 
 
@@ -10,19 +10,9 @@ import { Subscription } from 'rxjs';
   templateUrl: './redistribute.component.html',
   styleUrl: './redistribute.component.scss'
 })
-export class RedistributeComponent implements OnDestroy {
+export class RedistributeComponent {
 
-  private _stateSub?: Subscription;
-
-
-  constructor(private restore: RestoreService, private state: AppStateService) {
-    this._stateSub = this.state.stateChanged.subscribe(state => {
-      if (state == AppState.battle || state == AppState.buyTroops) {
-        this.restore.set();
-      }
-      else this.restore.delete();
-    });
-  }
+  constructor(private restore: RestoreService, private state: AppStateService) { }
 
 
   onCancel() {
@@ -32,9 +22,5 @@ export class RedistributeComponent implements OnDestroy {
 
   onSubmit() {
     this.state.stateCompleted();
-  }
-
-  ngOnDestroy() {
-    this._stateSub?.unsubscribe();
   }
 }

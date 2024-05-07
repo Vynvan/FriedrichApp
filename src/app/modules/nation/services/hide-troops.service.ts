@@ -15,7 +15,7 @@ export class HideTroopsService {
   private stateSub: Subscription;
   private _hidden$: BehaviorSubject<boolean>;
   get hidden$(): Observable<boolean> {
-    return this._hidden$.asObservable();
+    return this._hidden$ as Observable<boolean>;
   }
 
   constructor(private session: SessionService, state: AppStateService) {
@@ -41,6 +41,7 @@ export class HideTroopsService {
     if (this._hidden$.getValue() != value) {
       this.session.saveHiddenState(value);
       this._hidden$.next(value);
+      console.log('hidden changes to ' + value);
     }
   }
 

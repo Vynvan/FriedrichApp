@@ -14,7 +14,7 @@ import { HideTroopsService } from '../../services/hide-troops.service';
 })
 export class ArmyComponent implements OnChanges {
 
-  private _edit = false;
+  private edit = false;
   private editSub?: Subscription;
   private troopsSubj = new ReplaySubject<[number, boolean][]>(1);
   troopVisibility = 'hidden';
@@ -30,8 +30,8 @@ export class ArmyComponent implements OnChanges {
   set editMode(o: Observable<boolean>) {
     this.editSub?.unsubscribe();
     this.editSub = o.subscribe(edit => {
-      if (this._edit != edit) {
-        this._edit = edit;
+      if (this.edit != edit) {
+        this.edit = edit;
         this.setTroops();
       }
     });
@@ -41,7 +41,7 @@ export class ArmyComponent implements OnChanges {
 
 
   get troopStates$(): Observable<[number, boolean][]> {
-    return this.troopsSubj.asObservable();
+    return this.troopsSubj as Observable<[number, boolean][]>;
   }
 
   
@@ -53,9 +53,8 @@ export class ArmyComponent implements OnChanges {
   ngOnChanges(changes: SimpleChanges): void {
     const relevantChange = changes['army'] || changes['remaining'];
     const validInputs = this.army.name != 'dummy' && this.remaining != undefined;
-    if (relevantChange && validInputs) {
+    if (relevantChange && validInputs)
       this.setTroops();
-    }
   }
 
   ngOnDestroy(): void {
@@ -69,16 +68,13 @@ export class ArmyComponent implements OnChanges {
    * @param troop 
    */
   onClick([troopIndex, isEnabled]: [number, boolean]) {
-    if (this._edit && (troopIndex > 1 || isEnabled)) {
+    if (this.edit && (troopIndex > 1 || isEnabled)) {
       let troopCount: number;
-      let last = troopIndex > 1 && isEnabled && troopIndex == this.army.troops; // If not the first troop and last enabled
-      let max = this.getMaxTroops();
-      if (troopIndex == max || last) { // If last selectable
+      const last = troopIndex > 1 && isEnabled && troopIndex == this.army.troops; // If not the first troop and last enabled
+      const max = this.getMaxTroops();
+      if (troopIndex == max || last) // If last selectable
         troopCount = isEnabled ? troopIndex-1 : troopIndex;
-      }
-      else {
-        troopCount = troopIndex;
-      }
+      else troopCount = troopIndex;
       this.submitChange(troopCount);
     }
   }
@@ -93,12 +89,10 @@ export class ArmyComponent implements OnChanges {
   private setTroops() {
     const ar: [number, boolean][] = [];
     for (let i = 1; i <= this.army.maxTroops; i++) {
-      if (i <= this.army.troops) {
+      if (i <= this.army.troops)
         ar.push([i, true]);
-      }
-      else if (this._edit && (this.getMaxTroops() - i) >= 0) {
+      else if (this.edit && (this.getMaxTroops() - i) >= 0)
         ar.push([i, false]);
-      }
       else break;
     }
     this.troopsSubj.next(ar);
@@ -109,7 +103,7 @@ export class ArmyComponent implements OnChanges {
    * @param troopCount 
    */
   private submitChange(troopCount: number) {
-      this.army.troops = troopCount;
-      this.troopsChanged.emit(this.army);
+    this.army.troops = troopCount;
+    this.troopsChanged.emit(this.army);
   }
 }

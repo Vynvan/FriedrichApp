@@ -20,7 +20,7 @@ import { AppState, AppStateService } from '@services/appState/appState.service';
 })
 export class NationComponent implements OnDestroy {
 
-  private _editMode = new BehaviorSubject<boolean>(false);
+  private editMode = new BehaviorSubject<boolean>(false);
   private editSub?: Subscription;
   private nation!: Nation$;
 
@@ -35,11 +35,11 @@ export class NationComponent implements OnDestroy {
   
   
   get armies$(): Observable<Army[]> {
-    return combineLatest(this.nation.armies$);
+    return this.nation.armies$;
   }
 
   get editMode$(): Observable<boolean> {
-    return this._editMode.asObservable();
+    return this.editMode as Observable<boolean>;
   }
 
   get maxTroops(): number {
@@ -77,9 +77,9 @@ export class NationComponent implements OnDestroy {
   private updateEditMode(value: AppState) {
     if ([AppState.distributeTroops, AppState.battle, AppState.buyTroops].includes(value)) {
       console.log(this.nation?.name + ': EditMode=true');
-      this._editMode.next(true);
+      this.editMode.next(true);
     }
     else if (value == AppState.inGame)
-      this._editMode.next(false);
+      this.editMode.next(false);
   }
 }

@@ -73,7 +73,7 @@ export class AppStateService implements OnDestroy {
         const next = this.session.pickedNations.every(nation => nation.armies.every(army => army.troops == nation.maxTroops))
         ? AppState.inGame : AppState.distributeTroops;
         this._state = next;
-        this.session.saveNations(this.session.pickedNations);
+        this.session.saveNations(this.session.pickedNations, true);
         break;
       }
       default: {

@@ -1,4 +1,4 @@
-import { BehaviorSubject, Observable, Subject, combineLatest, connectable, from, map, mergeAll, share, shareReplay } from "rxjs";
+import { BehaviorSubject, Observable, Subject, combineLatest, connectable, from, map, mergeAll, share, shareReplay, tap } from "rxjs";
 
 
 export const dummy: Army = {
@@ -32,19 +32,17 @@ export class Nation$ implements Nation {
     armies: Army[];
     maxTroops: number;
     name: string;
-    updated$ = connectable(this.updated, { connector: () => new Subject() })
 
-
-    get armies$(): Observable<Army>[] {
-        return Array.from(this.subjects.values()).map(bs => bs.asObservable().pipe(shareReplay(1)));
+    get armies$(): Observable<Army[]> {
+        return combineLatest(Array.from(this.subjects.values()));
     }
 
-    // get updated$(): Observable<Army> {
-    //     return this.updated.pipe(share());
-    // }
+    get updated$(): Observable<Army> {
+        return this.updated as Observable<Army>;
+    }
 
     get troops$(): Observable<number> {
-        return combineLatest(this.armies$).pipe(
+        return this.armies$.pipe(
             map(armies => armies.map(a => a.troops)),
             map(troops => troops.reduce((prev, curr) => prev + curr, 0)));
     }
@@ -59,12 +57,7 @@ export class Nation$ implements Nation {
 
 
     updateArmy(army: Army): void {
-        const i = this.armies.findIndex(a => a.name === army.name);
-        if (i != -1 && this.armies[i].troops != army.troops) {
-            this.armies[i] = army;
-            this.subjects.get(army.name)?.next(army);
-            this.updated.next(army);
-        }
-        console.log('update ' + army.name);
+        this.subjects.get(army.name)?.next(army);
+        this.updated.next(army);
     }
 }

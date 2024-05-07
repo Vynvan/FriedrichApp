@@ -40,6 +40,7 @@ export class SessionService implements OnDestroy {
     });
     this.picked = [];
     sessionStorage.removeItem('active');
+    sessionStorage.removeItem('hidden');
     sessionStorage.removeItem('nations');
     sessionStorage.removeItem('state');
   }
@@ -58,7 +59,7 @@ export class SessionService implements OnDestroy {
     if (this.isBrowser) {
       const name = this.getActive();
       if (name)
-        return this.pickedNations.find(n => n.name === name)
+        return this.pickedNations.find(n => n.name === name);
       else if (this.pickedNations.length > 0)
         return this.picked[0];
     }
@@ -67,7 +68,9 @@ export class SessionService implements OnDestroy {
 
   getHiddenState(): boolean {
     if (this.isBrowser) {
-      return Boolean(sessionStorage.getItem('hidden'));
+      const save = sessionStorage.getItem('hidden');
+      console.log('session gives hidden=' + (save != null && save === 'true'));
+      return save != null && save === 'true';
     }
     return false;
   }
@@ -119,12 +122,12 @@ export class SessionService implements OnDestroy {
 
   pickNations(nations: Nation[]) {
     this.picked = nations.map(nat => {
-      const n = new Nation$(nat);
-      const sub = n.updated$.subscribe(army => this.saveArmy(army.name, army.troops));
+      let n = new Nation$(nat);
+      let sub = n.updated$.subscribe(army => this.saveArmy(army.name, army.troops));
       this.subs.push(sub);
       return n;
     });
-    console.log(this.subs.length);
+    console.log(`pickNations subscribes to ${this.subs.length} nations.`);
   }
 
   saveActive(name: string) {
@@ -142,10 +145,16 @@ export class SessionService implements OnDestroy {
       sessionStorage.setItem('hidden', String(value));
   }
 
-  saveNations(nations: Nation[]) {
-    let names = '';
-    nations.forEach(nation => names += nation.name + ';');
-    sessionStorage.setItem('nations', names);
+  saveNations(nations: Nation[], initialArmySave=false) {
+    if (this.isBrowser) {
+      let names = '';
+      nations.forEach(nation => {
+        names += nation.name + ';'
+        if (initialArmySave)
+          nation.armies.forEach(a => sessionStorage.setItem(a.name, a.troops.toString()));
+      });
+      sessionStorage.setItem('nations', names);
+    }
   }
 
   saveState(state: number) {

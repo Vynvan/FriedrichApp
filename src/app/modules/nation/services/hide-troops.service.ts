@@ -11,23 +11,23 @@ import { AppState, AppStateService } from '@app/services/appState/appState.servi
 })
 export class HideTroopsService {
 
-  private _before: boolean;
+  private before: boolean;
   private stateSub: Subscription;
-  private _hidden$: BehaviorSubject<boolean>;
+  private hiddenSubj: BehaviorSubject<boolean>;
   get hidden$(): Observable<boolean> {
-    return this._hidden$ as Observable<boolean>;
+    return this.hiddenSubj as Observable<boolean>;
   }
 
   constructor(private session: SessionService, state: AppStateService) {
-    this._before = this.session.getHiddenState();
-    this._hidden$ = new BehaviorSubject(this._before);
+    this.before = this.session.getHiddenState();
+    this.hiddenSubj = new BehaviorSubject(this.before);
     this.stateSub = state.stateChanged.subscribe(next => {
       if ([AppState.battle, AppState.buyTroops].includes(next)) {
-        this._before = this._hidden$.getValue();
+        this.before = this.hiddenSubj.getValue();
         this.changeHidden(false);
       }
       else if (next == AppState.inGame) {
-        this.changeHidden(this._before);
+        this.changeHidden(this.before);
       }
     });
   }
@@ -38,9 +38,9 @@ export class HideTroopsService {
  * @param value 
  */
   changeHidden(value: boolean) {
-    if (this._hidden$.getValue() != value) {
+    if (this.hiddenSubj.getValue() != value) {
       this.session.saveHiddenState(value);
-      this._hidden$.next(value);
+      this.hiddenSubj.next(value);
       console.log('hidden changes to ' + value);
     }
   }

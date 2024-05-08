@@ -3,6 +3,7 @@ import { Observable, ReplaySubject, Subscription } from 'rxjs';
 
 import { Army, dummy } from '@app/services/model';
 import { HideTroopsService } from '../../services/hide-troops.service';
+import { AppState, AppStateService } from '@app/services/appState/appState.service';
 
 
 
@@ -14,11 +15,16 @@ import { HideTroopsService } from '../../services/hide-troops.service';
 })
 export class ArmyComponent implements OnChanges {
 
+  private appearanceClass = '';
   private edit = false;
   private editSub?: Subscription;
   private troopsSubj = new ReplaySubject<[number, boolean][]>(1);
   troopVisibility = 'hidden';
 
+
+  get appearance(): string {
+    return this.appearanceClass;
+  }
 
   @Input({ required: true })
   army: Army = dummy;
@@ -45,7 +51,7 @@ export class ArmyComponent implements OnChanges {
   }
 
   
-  constructor(hide: HideTroopsService) {
+  constructor(hide: HideTroopsService, private state: AppStateService) {
     hide.hidden$.subscribe(value => this.troopVisibility = value ? 'hidden' : 'visible');
   }
 
@@ -83,6 +89,12 @@ export class ArmyComponent implements OnChanges {
     return this.army.troops + this.remaining < this.army.maxTroops ? this.army.troops + this.remaining : this.army.maxTroops;
   }
   
+  private setAppearance() {
+    if ([AppState.preBattle].includes(this.state.state)) {
+      this.appearanceClass = 'preBattle';
+    }
+  }
+
   /**
    * Subscribes to the army observable, so whenever army$ changes, a new troopstate is computed here and updated via the troopsSubj.
    */

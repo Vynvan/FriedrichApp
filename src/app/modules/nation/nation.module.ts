@@ -13,11 +13,13 @@ import { IngameComponent } from './components/ingame/ingame.component';
 import { NationComponent } from './components/nation/nation.component';
 import { NationRoutingModule } from './nation-routing.module';
 import { RedistributeComponent } from './components/redistribute/redistribute.component';
+import { BattleComponent } from './components/battle/battle.component';
 
 
 @NgModule({
   declarations: [
     ArmyComponent,
+    BattleComponent,
     DistributeComponent,
     IngameComponent,
     NationComponent,

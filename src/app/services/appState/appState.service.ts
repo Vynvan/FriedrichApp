@@ -10,9 +10,9 @@ export enum AppState {
   pickNations,
   distributeTroops,
   inGame,
+  preBattle,
   battle,
-  buyTroops,
-  afterGame
+  buyTroops
 }
 
 
@@ -28,22 +28,22 @@ export enum AppState {
 export class AppStateService implements OnDestroy {
 
   private _state: AppState;
-  private _stateSub: Subscription;
-
+  private stateSub: Subscription;
+  
   get state(): AppState {
     return this._state;
   }
+  private set state(value: AppState) {
+    this._state = value;
+    this.stateChanged.emit(value);
+  }
 
-  stateChanged: EventEmitter<AppState>;
+  stateChanged = new EventEmitter<AppState>();
 
 
   constructor(private session: SessionService, private restore: RestoreService) {
     this._state = this.session.getState() ?? AppState.pickNations;
-
-    this.stateChanged = new EventEmitter<AppState>();
-    this._stateSub = this.stateChanged.subscribe(next => {
-      this.session.saveState(next);
-    });
+    this.stateSub = this.stateChanged.subscribe(next => this.session.saveState(next));
   }
 
 
@@ -52,15 +52,14 @@ export class AppStateService implements OnDestroy {
    */
   cancel() {
     this.session.delete();
-    this._state = AppState.pickNations;
-    this.stateChanged.emit(AppState.pickNations);
+    this.state = AppState.pickNations;
   }
 
   goto(state: AppState) {
     if ([AppState.buyTroops, AppState.battle].includes(state)) {
       this.restore.set();
     }
-    this.stateChanged.emit(state);
+    this.state = state;
   }
 
   /**
@@ -72,19 +71,18 @@ export class AppStateService implements OnDestroy {
         // If every army of every picked nation is at maxTroops (like sweden or imperialArmy), the distributeTroops phase is skipped.
         const next = this.session.pickedNations.every(nation => nation.armies.every(army => army.troops == nation.maxTroops))
         ? AppState.inGame : AppState.distributeTroops;
-        this._state = next;
         this.session.saveNations(this.session.pickedNations, true);
+        this.state = next;
         break;
       }
       default: {
         this.restore.delete();
-        this._state = AppState.inGame;
+        this.state = AppState.inGame;
       }
     }
-    this.stateChanged.emit(this._state);
   }
 
   ngOnDestroy(): void {
-    this._stateSub.unsubscribe();
+    this.stateSub.unsubscribe();
   }
 }

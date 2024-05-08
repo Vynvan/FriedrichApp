@@ -69,7 +69,6 @@ export class SessionService implements OnDestroy {
   getHiddenState(): boolean {
     if (this.isBrowser) {
       const save = sessionStorage.getItem('hidden');
-      console.log('session gives hidden=' + (save != null && save === 'true'));
       return save != null && save === 'true';
     }
     return false;
@@ -127,7 +126,6 @@ export class SessionService implements OnDestroy {
       this.subs.push(sub);
       return n;
     });
-    console.log(`pickNations subscribes to ${this.subs.length} nations.`);
   }
 
   saveActive(name: string) {

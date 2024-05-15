@@ -8,7 +8,6 @@
 </div>
 @for (army of this.armies$ | async; track $index) {
     <app-army [army]="army" 
-        [editMode]="this.editMode$" 
         [remaining]="(this.remainingTroops$ | async) ?? 0" 
         (troopsChanged)="this.updateArmy($event)">
     </app-army>

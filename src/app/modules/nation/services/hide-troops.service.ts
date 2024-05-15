@@ -21,7 +21,7 @@ export class HideTroopsService {
   constructor(private session: SessionService, state: AppStateService) {
     this.before = this.session.getHiddenState();
     this.hiddenSubj = new BehaviorSubject(this.before);
-    this.stateSub = state.stateChanged.subscribe(next => {
+    this.stateSub = state.state$.subscribe(next => {
       if ([AppState.battle, AppState.buyTroops].includes(next)) {
         this.before = this.hiddenSubj.getValue();
         this.changeHidden(false);
@@ -41,7 +41,6 @@ export class HideTroopsService {
     if (this.hiddenSubj.getValue() != value) {
       this.session.saveHiddenState(value);
       this.hiddenSubj.next(value);
-      console.log('hidden changes to ' + value);
     }
   }
 

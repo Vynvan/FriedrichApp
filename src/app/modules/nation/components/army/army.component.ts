@@ -15,33 +15,19 @@ import { AppState, AppStateService } from '@app/services/appState/appState.servi
 })
 export class ArmyComponent implements OnChanges {
 
-  private appearanceClass = '';
   private edit = false;
-  private editSub?: Subscription;
+  private hideSub: Subscription;
+  private stateSub: Subscription;
   private troopsSubj = new ReplaySubject<[number, boolean][]>(1);
+  appearanceClass = 'army-details';
   troopVisibility = 'hidden';
 
-
-  get appearance(): string {
-    return this.appearanceClass;
-  }
 
   @Input({ required: true })
   army: Army = dummy;
 
   @Input({ required: true, transform: numberAttribute })
   private remaining!: number;
-
-  @Input({ required: true })
-  set editMode(o: Observable<boolean>) {
-    this.editSub?.unsubscribe();
-    this.editSub = o.subscribe(edit => {
-      if (this.edit != edit) {
-        this.edit = edit;
-        this.setTroops();
-      }
-    });
-  }
 
   @Output() troopsChanged = new EventEmitter<Army>();
 
@@ -51,8 +37,12 @@ export class ArmyComponent implements OnChanges {
   }
 
   
-  constructor(hide: HideTroopsService, private state: AppStateService) {
-    hide.hidden$.subscribe(value => this.troopVisibility = value ? 'hidden' : 'visible');
+  constructor(hide: HideTroopsService, state: AppStateService) {
+    this.hideSub = hide.hidden$.subscribe(value => this.troopVisibility = value ? 'hidden' : 'visible');
+    this.stateSub = state.state$.subscribe(s => {
+      this.setAppearance(s);
+      this.setEdit(s);
+    });
   }
 
 
@@ -64,7 +54,8 @@ export class ArmyComponent implements OnChanges {
   }
 
   ngOnDestroy(): void {
-    this.editSub?.unsubscribe();
+    this.hideSub.unsubscribe();
+    this.stateSub.unsubscribe();
   }
 
   /**
@@ -89,10 +80,15 @@ export class ArmyComponent implements OnChanges {
     return this.army.troops + this.remaining < this.army.maxTroops ? this.army.troops + this.remaining : this.army.maxTroops;
   }
   
-  private setAppearance() {
-    if ([AppState.preBattle].includes(this.state.state)) {
-      this.appearanceClass = 'preBattle';
-    }
+  private setAppearance(state: AppState) {
+    if (state == AppState.preBattle)
+      this.appearanceClass = 'army-button';
+    else this.appearanceClass = '';
+  }
+
+  private setEdit(state: AppState) {
+    this.edit = [AppState.buyTroops, AppState.distributeTroops, AppState.battle].includes(state);
+    console.log(`${this.army.name}: state=${state}, edit=${this.edit}`);
   }
 
   /**
@@ -108,6 +104,7 @@ export class ArmyComponent implements OnChanges {
       else break;
     }
     this.troopsSubj.next(ar);
+    console.log(`${this.army.name} set troops`);
   }
   
   /**

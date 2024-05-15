@@ -22,8 +22,7 @@ export class AppComponent {
 
 
   constructor(private appState: AppStateService, private router: Router, private session: SessionService) {
-    this.appState.stateChanged.subscribe(next => this.computeState(next));
-    this.computeState();
+    this.appState.state$.subscribe(next => this.computeState(next));
   }
 
 
@@ -31,10 +30,7 @@ export class AppComponent {
    * Eventhandler for AppState.stateChanged:
    * Navigates to the sub-components according to the given state.
    */
-  private computeState(state?: AppState) {
-    if (!state)
-      state = this.appState.state;
-    
+  private computeState(state: AppState) {
     const active = this.session.getActive() ?? '';
     switch(state) {
       case(AppState.pickNations): {

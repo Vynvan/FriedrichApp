@@ -18,10 +18,8 @@ import { AppState, AppStateService } from '@services/appState/appState.service';
     templateUrl: './nation.component.html',
     styleUrl: './nation.component.scss',
 })
-export class NationComponent implements OnDestroy {
+export class NationComponent {
 
-  private editMode = new BehaviorSubject<boolean>(false);
-  private editSub?: Subscription;
   private nation!: Nation$;
 
 
@@ -38,10 +36,6 @@ export class NationComponent implements OnDestroy {
     return this.nation.armies$;
   }
 
-  get editMode$(): Observable<boolean> {
-    return this.editMode as Observable<boolean>;
-  }
-
   get maxTroops(): number {
     return this.nation.maxTroops;
   }
@@ -55,11 +49,7 @@ export class NationComponent implements OnDestroy {
   }
 
 
-  constructor(private session: SessionService, state: AppStateService) {
-    const initialState = this.session.getState();
-    this.updateEditMode(initialState);
-    this.editSub = state.stateChanged.subscribe(changed => this.updateEditMode(changed));
-  }
+  constructor(private session: SessionService) { }
 
 
   /**
@@ -68,18 +58,5 @@ export class NationComponent implements OnDestroy {
    */
   updateArmy(updated: Army) {
     this.nation.updateArmy(updated);
-  }
-
-  ngOnDestroy() {
-    this.editSub?.unsubscribe();
-  }
-
-  private updateEditMode(value: AppState) {
-    if ([AppState.distributeTroops, AppState.battle, AppState.buyTroops].includes(value)) {
-      console.log(this.nation?.name + ': EditMode=true');
-      this.editMode.next(true);
-    }
-    else if (value == AppState.inGame)
-      this.editMode.next(false);
   }
 }

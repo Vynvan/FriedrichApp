@@ -2,7 +2,7 @@ import { Injectable, EventEmitter, OnDestroy } from '@angular/core';
 import { RestoreService } from '@app/modules/nation/services/restore.service';
 
 import { SessionService } from '@services/session/session.service';
-import { Subscription } from 'rxjs';
+import { BehaviorSubject, Observable, Subscription, tap } from 'rxjs';
 
 
 
@@ -29,21 +29,26 @@ export class AppStateService implements OnDestroy {
 
   private _state: AppState;
   private stateSub: Subscription;
+  private stateSubj: BehaviorSubject<AppState>;
   
   get state(): AppState {
     return this._state;
   }
   private set state(value: AppState) {
     this._state = value;
-    this.stateChanged.emit(value);
+    this.stateSubj.next(value);
   }
 
-  stateChanged = new EventEmitter<AppState>();
+  get state$(): Observable<AppState> {
+    return this.stateSubj as Observable<AppState>;
+  }
+
 
 
   constructor(private session: SessionService, private restore: RestoreService) {
     this._state = this.session.getState() ?? AppState.pickNations;
-    this.stateSub = this.stateChanged.subscribe(next => this.session.saveState(next));
+    this.stateSubj = new BehaviorSubject<AppState>(this._state);
+    this.stateSub = this.stateSubj.subscribe(s => this.session.saveState(s));
   }
 
 

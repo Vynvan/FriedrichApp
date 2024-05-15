@@ -38,7 +38,7 @@ export class IngameComponent implements OnDestroy {
   }
 
   startBattle() {
-    this.state.goto(AppState.battle);
+    this.state.goto(AppState.preBattle);
   }
 
   ngOnDestroy() {

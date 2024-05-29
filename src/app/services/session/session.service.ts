@@ -35,14 +35,17 @@ export class SessionService implements OnDestroy {
    */
   delete() {
     this.nations.setAll();
-    this.picked.forEach(nation => {
-      nation.armies.forEach(army => sessionStorage.removeItem(army.name));
-    });
+    if (this.isBrowser) {
+      sessionStorage.removeItem('active');
+      sessionStorage.removeItem('hidden');
+      sessionStorage.removeItem('nations');
+      sessionStorage.removeItem('state');
+      this.picked.forEach(nation => {
+        nation.armies.forEach(army => sessionStorage.removeItem(army.name));
+      });
+    }
     this.picked = [];
-    sessionStorage.removeItem('active');
-    sessionStorage.removeItem('hidden');
-    sessionStorage.removeItem('nations');
-    sessionStorage.removeItem('state');
+    this.ngOnDestroy();
   }
 
   getActive(): string | null {
@@ -64,6 +67,20 @@ export class SessionService implements OnDestroy {
         return this.picked[0];
     }
     return undefined;
+  }
+
+  getBattleParty(): string[] {
+    const party: string[] = [];
+    if (this.isBrowser) {
+      const partyStr = sessionStorage.getItem('party');
+      if (partyStr) {
+        partyStr.split(';').forEach(a => {
+          if (a?.length > 0)
+            party.push(a);
+        });
+      }
+    }
+    return party;
   }
 
   getHiddenState(): boolean {
@@ -138,6 +155,14 @@ export class SessionService implements OnDestroy {
       sessionStorage.setItem(name, troops.toString());
   }
 
+  saveBattleParty(party: string[]) {
+    if(this.isBrowser) {
+      let partyStr = '';
+      party.forEach(p => partyStr += p + ';');
+      sessionStorage.setItem('party', partyStr);
+    }
+  }
+
   saveHiddenState(value: boolean) {
     if (this.isBrowser)
       sessionStorage.setItem('hidden', String(value));
@@ -147,7 +172,7 @@ export class SessionService implements OnDestroy {
     if (this.isBrowser) {
       let names = '';
       nations.forEach(nation => {
-        names += nation.name + ';'
+        names += nation.name + ';';
         if (initialArmySave)
           nation.armies.forEach(a => sessionStorage.setItem(a.name, a.troops.toString()));
       });

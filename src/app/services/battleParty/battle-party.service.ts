@@ -16,7 +16,7 @@ export class BattlePartyService {
   private _party: Army[] = [];
   set party(value: Army[]) {
     this._party = value;
-    this.session.saveBattleParty(value.map(a => a.name));
+    this.session.saveBattleParty(value);
   }
   
 

@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 
 import { Army, Nation } from '@app/services/model';
 import { NationService } from '@app/services/nation/nation.service';
+import { SessionService } from '@app/services/session/session.service';
 
 
 
@@ -14,7 +15,7 @@ export class EnemyService {
   party: Army[] = [];
 
 
-  constructor(private nations: NationService) { }
+  constructor(private nations: NationService, private session: SessionService) { }
 
 
   setEnemyNation(value: string) {

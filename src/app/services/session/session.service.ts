@@ -1,7 +1,7 @@
 import { isPlatformBrowser } from '@angular/common';
 import { Injectable, Inject, PLATFORM_ID, OnDestroy } from '@angular/core';
 
-import { Nation, Nation$ } from '@services/model';
+import { Army, Nation, Nation$ } from '@services/model';
 import { NationService } from '@services/nation/nation.service';
 import { Subscription } from 'rxjs';
 
@@ -139,7 +139,7 @@ export class SessionService implements OnDestroy {
   pickNations(nations: Nation[]) {
     this.picked = nations.map(nat => {
       let n = new Nation$(nat);
-      let sub = n.updated$.subscribe(army => this.saveArmy(army.name, army.troops));
+      let sub = n.updated$.subscribe(army => this.saveArmy(army));
       this.subs.push(sub);
       return n;
     });
@@ -150,17 +150,17 @@ export class SessionService implements OnDestroy {
       sessionStorage.setItem('active', name);
   }
 
-  saveArmy(name: string, troops: number) {
+  saveArmy(army: Army) {
     if (this.isBrowser)
-      sessionStorage.setItem(name, troops.toString());
+      sessionStorage.setItem(army.name, army.troops.toString());
   }
 
-  saveBattleParty(party: string[]) {
-    if(this.isBrowser) {
-      let partyStr = '';
-      party.forEach(p => partyStr += p + ';');
-      sessionStorage.setItem('party', partyStr);
-    }
+  saveBattleParty(party: Army[]) {
+    this.saveArrayToString(party.map(p => p.name), 'party');
+  }
+
+  saveEnemyParty(party: Army[]) {
+    this.saveArrayToString(party.map(p => p.name), 'enemyParty');
   }
 
   saveHiddenState(value: boolean) {
@@ -183,5 +183,14 @@ export class SessionService implements OnDestroy {
   saveState(state: number) {
     if (this.isBrowser)
       sessionStorage.setItem('state', state.toString());
+  }
+
+
+  private saveArrayToString(ar: string[], sessionName: string) {
+    if (this.isBrowser) {
+      let saveStr = '';
+      ar.forEach(elem => saveStr += elem + ';');
+      sessionStorage.setItem(sessionName, saveStr);
+    }
   }
 }

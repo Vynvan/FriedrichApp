@@ -14,6 +14,9 @@ export class BattlePartyService {
   }
 
   private _party: Army[] = [];
+  get party(): Army[] {
+    return this._party;
+  }
   set party(value: Army[]) {
     this._party = value;
     this.session.saveBattleParty(value);
@@ -28,6 +31,7 @@ export class BattlePartyService {
   reset() {
     this._nation = undefined;
     this._party = [];
+    this.session.deleteParty();
   }
 
 

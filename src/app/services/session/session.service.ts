@@ -39,6 +39,7 @@ export class SessionService implements OnDestroy {
       sessionStorage.removeItem('active');
       sessionStorage.removeItem('hidden');
       sessionStorage.removeItem('nations');
+      sessionStorage.removeItem('party');
       sessionStorage.removeItem('state');
       this.picked.forEach(nation => {
         nation.armies.forEach(army => sessionStorage.removeItem(army.name));
@@ -46,6 +47,11 @@ export class SessionService implements OnDestroy {
     }
     this.picked = [];
     this.ngOnDestroy();
+  }
+
+  deleteParty() {
+    if (this.isBrowser)
+      sessionStorage.removeItem('party');
   }
 
   getActive(): string | null {

@@ -50,6 +50,7 @@ export class ArmyComponent implements OnChanges {
     const relevantChange = changes['army'] || changes['remaining'];
     const validInputs = this.army.name != 'dummy' && this.remaining != undefined;
     if (relevantChange && validInputs)
+      console.log(relevantChange);
       this.setTroops();
   }
 
@@ -83,12 +84,14 @@ export class ArmyComponent implements OnChanges {
   private setAppearance(state: AppState) {
     if (state == AppState.preBattle)
       this.appearanceClass = 'army-button';
-    else this.appearanceClass = '';
+    else this.appearanceClass = 'army-details';
   }
 
   private setEdit(state: AppState) {
+    const oldEdit = this.edit;
     this.edit = [AppState.buyTroops, AppState.distributeTroops, AppState.battle].includes(state);
-    console.log(`${this.army.name}: state=${state}, edit=${this.edit}`);
+    if (oldEdit != this.edit)
+      this.setTroops();
   }
 
   /**
@@ -104,7 +107,6 @@ export class ArmyComponent implements OnChanges {
       else break;
     }
     this.troopsSubj.next(ar);
-    console.log(`${this.army.name} set troops`);
   }
   
   /**

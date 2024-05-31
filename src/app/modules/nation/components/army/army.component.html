@@ -1,10 +1,11 @@
 <mat-card [ngClass]="this.appearanceClass">
     <mat-card-header>
         <mat-card-title>{{ this.army.name }}</mat-card-title>
-        <mat-card-subtitle>{{ this.army.startsOn }}</mat-card-subtitle>
     </mat-card-header>
-    <mat-card-content [style.visibility]="this.troopVisibility">
-        <div class="troops">
+    <mat-card-content>
+        <span>{{ this.army.startsOn }}</span>
+        <span class="troopsCount" [style.visibility]="this.troopVisibility">{{ this.army.troops }} / {{ this.army.maxTroops }}</span>
+        <div class="troops" [style.visibility]="this.troopVisibility">
             @for (item of (this.troopStates$) | async; track item[0]) {
                 @if (item[1]) { 
                     <mat-icon (click)='onClick(item)'>face</mat-icon>
@@ -14,6 +15,5 @@
                 }
             }
         </div>
-        <span class="troopsCount">{{ this.army.troops }} / {{ this.army.maxTroops }}</span>
     </mat-card-content>
 </mat-card>

@@ -2,8 +2,8 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterOutlet } from '@angular/router';
 
-import { SessionService } from '@app/services/session/session.service';
-import { AppStateService, AppState } from '@services/appState/appState.service';
+import { GameStateService, GameState } from '@services/gameState/gameState.service';
+import { SessionService } from '@services/session/session.service';
 
 
 @Component({
@@ -21,8 +21,8 @@ export class AppComponent {
   title = 'FriedrichApp';
 
 
-  constructor(private appState: AppStateService, private router: Router, private session: SessionService) {
-    this.appState.state$.subscribe(next => this.computeState(next));
+  constructor(private state: GameStateService, private router: Router, private session: SessionService) {
+    this.state.state$.subscribe(next => this.computeState(next));
   }
 
 
@@ -30,23 +30,22 @@ export class AppComponent {
    * Eventhandler for AppState.stateChanged:
    * Navigates to the sub-components according to the given state.
    */
-  private computeState(state: AppState) {
-    const active = this.session.getActive() ?? '';
+  private computeState(state: GameState) {
     switch(state) {
-      case(AppState.pickNations): {
+      case(GameState.pickNations): {
         this.router.navigate(['NationSelect']);
         break;
       }
-      case(AppState.distributeTroops): {
-        this.router.navigate([active, 'Distribute']);
+      case(GameState.distributeTroops): {
+        this.router.navigate([this.session.activeNation.name, 'Distribute']);
         break;
       }
-      case(AppState.inGame): {
-        this.router.navigate([active]);
+      case(GameState.inGame): {
+        this.router.navigate([this.session.activeNation.name]);
         break;
       }
-      case(AppState.buyTroops): {
-        this.router.navigate([active, 'BuyTroops']);
+      case(GameState.buyTroops): {
+        this.router.navigate([this.session.activeNation.name, 'BuyTroops']);
         break;
       }
     }

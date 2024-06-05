@@ -1,9 +1,8 @@
-import { Component, Input, OnDestroy } from '@angular/core';
-import { BehaviorSubject, combineLatest, map, Observable, Subscription } from 'rxjs';
+import { Component, Input } from '@angular/core';
+import { map, Observable } from 'rxjs';
 
 import { Army, Nation$ } from '@services/model';
 import { SessionService } from '@services/session/session.service';
-import { AppState, AppStateService } from '@services/appState/appState.service';
 
 
 
@@ -25,7 +24,8 @@ export class NationComponent {
 
   @Input()
   set nationName(name: string) {
-    this.nation = this.session.pickedNations.find(nation => nation.name === name) ?? this.session.pickedNations[0];
+    this.session.saveActive(name);
+    this.nation = this.session.activeNation;
   }
   get nationName(): string {
     return this.nation.name;

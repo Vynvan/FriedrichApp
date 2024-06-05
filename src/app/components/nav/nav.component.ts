@@ -5,7 +5,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 
-import { AppState, AppStateService } from '@services/appState/appState.service';
+import { GameState, GameStateService } from '@services/gameState/gameState.service';
 import { SessionService } from '@services/session/session.service';
 
 
@@ -25,16 +25,13 @@ import { SessionService } from '@services/session/session.service';
 })
 export class NavComponent {
 
-  private _activeNation!: string;
-
-
-  @Input({ required: true })
-  set activeNation(a: string) {
-    this._activeNation = a;
-    this.session.saveActive(a);
-  }
+  // @Input({ required: true })
+  // set activeNation(a: string) {
+  //   this._activeNation = a;
+  //   this.session.saveActive(a);
+  // }
   get activeNation(): string {
-    return this._activeNation;
+    return this.session.activeNation?.name ?? "";
   }
   
   get nationNames(): string[] {
@@ -42,7 +39,7 @@ export class NavComponent {
   }
 
 
-  constructor(private session: SessionService, private state: AppStateService) {}
+  constructor(private session: SessionService, private state: GameStateService) {}
 
 
   endGame() {
@@ -52,11 +49,11 @@ export class NavComponent {
   navigateTo(nationName: string): string {
     const to = `/${ nationName }`;
     switch(this.state.state) {
-      case AppState.battle:
+      case GameState.battle:
         return to + '/Battle';
-      case AppState.buyTroops:
+      case GameState.buyTroops:
         return to + '/BuyTroops';
-      case AppState.distributeTroops:
+      case GameState.distributeTroops:
         return to + '/Distribute';
     }
     return to;

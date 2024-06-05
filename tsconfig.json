@@ -7,6 +7,7 @@
       "@app/*": ["src/app/*"],
       "@components/*": ["src/app/components/*"],
       "@dialogs/*": ["src/app/components/dialogs/*"],
+      "@nation/*": ["src/app/modules/nation/*"],
       "@services/*": ["src/app/services/*"]
     },
     "outDir": "./dist/out-tsc",

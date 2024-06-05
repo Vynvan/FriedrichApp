@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 
-import { AppStateService } from '@app/services/appState/appState.service';
-import { RestoreService } from '../../services/restore.service';
+import { GameStateService } from '@services/gameState/gameState.service';
+import { RestoreService } from '@services/restore/restore.service';
 
 
 
@@ -12,7 +12,7 @@ import { RestoreService } from '../../services/restore.service';
 })
 export class RedistributeComponent {
 
-  constructor(private restore: RestoreService, private state: AppStateService) { }
+  constructor(private restore: RestoreService, private state: GameStateService) { }
 
 
   onCancel() {

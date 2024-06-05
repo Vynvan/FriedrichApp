@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { BattlePartyService } from './battle-party.service';
+import { GameStateService } from './gameState.service';
 
-describe('BattlePartyService', () => {
-  let service: BattlePartyService;
+describe('GameStateService', () => {
+  let service: GameStateService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(BattlePartyService);
+    service = TestBed.inject(GameStateService);
   });
 
   it('should be created', () => {

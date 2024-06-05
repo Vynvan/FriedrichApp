@@ -1,9 +1,9 @@
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, numberAttribute } from '@angular/core';
 import { Observable, ReplaySubject, Subscription } from 'rxjs';
 
-import { Army, dummy } from '@app/services/model';
-import { HideTroopsService } from '../../services/hide-troops.service';
-import { AppState, AppStateService } from '@app/services/appState/appState.service';
+import { Army, dummy } from '@services/model';
+import { GameState, GameStateService } from '@services/gameState/gameState.service';
+import { HideTroopsService } from '@nation/services/hide-troops/hide-troops.service';
 
 
 
@@ -37,7 +37,7 @@ export class ArmyComponent implements OnChanges {
   }
 
   
-  constructor(hide: HideTroopsService, state: AppStateService) {
+  constructor(hide: HideTroopsService, state: GameStateService) {
     this.hideSub = hide.hidden$.subscribe(value => this.troopVisibility = value ? 'hidden' : 'visible');
     this.stateSub = state.state$.subscribe(s => {
       this.setAppearance(s);
@@ -50,7 +50,6 @@ export class ArmyComponent implements OnChanges {
     const relevantChange = changes['army'] || changes['remaining'];
     const validInputs = this.army.name != 'dummy' && this.remaining != undefined;
     if (relevantChange && validInputs)
-      console.log(relevantChange);
       this.setTroops();
   }
 
@@ -81,15 +80,15 @@ export class ArmyComponent implements OnChanges {
     return this.army.troops + this.remaining < this.army.maxTroops ? this.army.troops + this.remaining : this.army.maxTroops;
   }
   
-  private setAppearance(state: AppState) {
-    if (state == AppState.preBattle)
+  private setAppearance(state: GameState) {
+    if (state == GameState.preBattle)
       this.appearanceClass = 'army-button';
     else this.appearanceClass = 'army-details';
   }
 
-  private setEdit(state: AppState) {
+  private setEdit(state: GameState) {
     const oldEdit = this.edit;
-    this.edit = [AppState.buyTroops, AppState.distributeTroops, AppState.battle].includes(state);
+    this.edit = [GameState.buyTroops, GameState.distributeTroops, GameState.battle].includes(state);
     if (oldEdit != this.edit)
       this.setTroops();
   }

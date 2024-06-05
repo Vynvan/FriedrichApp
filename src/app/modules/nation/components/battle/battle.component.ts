@@ -1,8 +1,8 @@
 import { Component, Input } from '@angular/core';
 
-import { Army, Nation } from '@app/services/model';
-import { SessionService } from '@app/services/session/session.service';
-import { EnemyService } from '../../services/enemy/enemy.service';
+import { Army, Nation } from '@services/model';
+import { SessionService } from '@services/session/session.service';
+import { EnemyService } from '@nation/services/enemy/enemy.service';
 
 
 

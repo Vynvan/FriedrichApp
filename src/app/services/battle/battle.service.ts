@@ -21,10 +21,11 @@ export class BattlePartyService {
     this._party = value;
     this.session.saveBattleParty(value);
   }
-  
+
 
   constructor(private session: SessionService) {
-    this.fromSession();
+    this._nation = this.session.activeNation;
+    this._party = this.session.getBattleParty();
   }
 
   
@@ -35,15 +36,4 @@ export class BattlePartyService {
   }
 
 
-  private fromSession() {
-    this._nation = this.session.getActiveNation();
-    const partyStr = this.session.getBattleParty();
-    if (partyStr.length > 0) {
-      partyStr.forEach(name => {
-        const army = this._nation?.armies.find(a => a.name == name);
-        if (army)
-          this._party.push(army);
-      });
-    }
-  }
 }

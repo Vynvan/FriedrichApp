@@ -4,9 +4,9 @@ import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatIconModule } from '@angular/material/icon';
-import { AppStateService } from '@app/services/appState/appState.service';
 
 import { Nation } from '@services/model';
+import { GameStateService } from '@services/gameState/gameState.service';
 import { NationService } from '@services/nation/nation.service';
 import { SessionService } from '@services/session/session.service';
 
@@ -33,7 +33,7 @@ export class NationSelectComponent {
   }
 
 
-  constructor(nations: NationService, private session: SessionService, private state: AppStateService) {
+  constructor(nations: NationService, private session: SessionService, private state: GameStateService) {
     this.all = nations.getAll();
     this.picked = {};
     this.all.forEach(nation => {

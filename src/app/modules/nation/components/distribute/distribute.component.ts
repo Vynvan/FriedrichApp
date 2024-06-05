@@ -4,9 +4,9 @@ import { Observable, Subscription, combineLatest, map } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 
 import { CancelDialogComponent } from '@dialogs/cancel/cancel-dialog.component';
-import { AppStateService } from '@services/appState/appState.service';
-import { SessionService } from '@services/session/session.service';
 import { Nation$ } from '@services/model';
+import { GameStateService } from '@services/gameState/gameState.service';
+import { SessionService } from '@services/session/session.service';
 
 
 
@@ -56,7 +56,7 @@ export class DistributeComponent implements OnDestroy {
   }
 
 
-  constructor(private session: SessionService, private dialog: MatDialog, private router: Router, private state: AppStateService) { }
+  constructor(private session: SessionService, private dialog: MatDialog, private router: Router, private state: GameStateService) { }
 
 
   nextNation() {

@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 
-import { Army, Nation } from '@app/services/model';
-import { NationService } from '@app/services/nation/nation.service';
-import { SessionService } from '@app/services/session/session.service';
+import { Army, Nation } from '@services/model';
+import { NationService } from '@services/nation/nation.service';
+import { SessionService } from '@services/session/session.service';
 
 
 

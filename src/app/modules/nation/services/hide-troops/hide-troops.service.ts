@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, Subscription } from 'rxjs';
 
-import { SessionService } from '@app/services/session/session.service';
-import { AppState, AppStateService } from '@app/services/appState/appState.service';
+import { GameState, GameStateService } from '@services/gameState/gameState.service';
+import { SessionService } from '@services/session/session.service';
 
 
 
@@ -18,15 +18,15 @@ export class HideTroopsService {
     return this.hiddenSubj as Observable<boolean>;
   }
 
-  constructor(private session: SessionService, state: AppStateService) {
+  constructor(private session: SessionService, state: GameStateService) {
     this.before = this.session.getHiddenState();
     this.hiddenSubj = new BehaviorSubject(this.before);
     this.stateSub = state.state$.subscribe(next => {
-      if ([AppState.battle, AppState.buyTroops].includes(next)) {
+      if ([GameState.battle, GameState.buyTroops].includes(next)) {
         this.before = this.hiddenSubj.getValue();
         this.changeHidden(false);
       }
-      else if (next == AppState.inGame) {
+      else if (next == GameState.inGame) {
         this.changeHidden(this.before);
       }
     });

@@ -17,6 +17,7 @@ export class IngameComponent implements OnDestroy {
 
   private hiddenSub: Subscription;
   hidden: boolean = false;
+  subState: boolean = false;
 
 
   constructor(session: SessionService, private hide: HideTroopsService, private state: GameStateService) {
@@ -26,7 +27,13 @@ export class IngameComponent implements OnDestroy {
 
 
   buyTroops() {
+    this.subState = true;
     this.state.goto(GameState.buyTroops);
+  }
+
+  cancel() {
+    this.subState = false;
+    this.state.cancel();
   }
 
   hideArmies() {
@@ -38,7 +45,16 @@ export class IngameComponent implements OnDestroy {
   }
 
   startBattle() {
+  }
+
+  startPreBattle() {
+    this.subState = true;
     this.state.goto(GameState.preBattle);
+  }
+
+  submit() {
+    this.subState = false;
+    this.state.stateCompleted();
   }
 
   ngOnDestroy() {

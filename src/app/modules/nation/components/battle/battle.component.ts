@@ -38,6 +38,7 @@ export class BattleComponent {
     
   }
 
+
   lost() {
 
     this.enemy.reset();

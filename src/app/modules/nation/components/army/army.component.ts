@@ -4,6 +4,7 @@ import { Observable, ReplaySubject, Subscription } from 'rxjs';
 import { Army, dummy } from '@services/model';
 import { GameState, GameStateService } from '@services/gameState/gameState.service';
 import { HideTroopsService } from '@nation/services/hide-troops/hide-troops.service';
+import { BattleService } from '@app/services/battle/battle.service';
 
 
 
@@ -20,6 +21,7 @@ export class ArmyComponent implements OnChanges {
   private stateSub: Subscription;
   private troopsSubj = new ReplaySubject<[number, boolean][]>(1);
   appearanceClass = 'army-details';
+  selected = false;
   troopVisibility = 'hidden';
 
 
@@ -37,7 +39,7 @@ export class ArmyComponent implements OnChanges {
   }
 
   
-  constructor(hide: HideTroopsService, state: GameStateService) {
+  constructor(private battle: BattleService, hide: HideTroopsService, state: GameStateService) {
     this.hideSub = hide.hidden$.subscribe(value => this.troopVisibility = value ? 'hidden' : 'visible');
     this.stateSub = state.state$.subscribe(s => {
       this.setAppearance(s);
@@ -45,6 +47,10 @@ export class ArmyComponent implements OnChanges {
     });
   }
 
+
+  deselect() {
+    this.battle.remove(this.army);
+  }
 
   ngOnChanges(changes: SimpleChanges): void {
     const relevantChange = changes['army'] || changes['remaining'];
@@ -75,6 +81,11 @@ export class ArmyComponent implements OnChanges {
       this.submitChange(troopCount);
     }
   }
+
+  select() {
+
+  }
+
 
   private getMaxTroops(): number {
     return this.army.troops + this.remaining < this.army.maxTroops ? this.army.troops + this.remaining : this.army.maxTroops;

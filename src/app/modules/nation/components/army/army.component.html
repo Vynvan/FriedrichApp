@@ -15,5 +15,15 @@
                 }
             }
         </div>
-    </mat-card-content>
+        @if (this.selected) {
+            <button mat-fab id="deselectButton" (click)="this.deselect()">
+                <mat-icon>done</mat-icon>
+            </button>
+        }
+        @else {
+            <button mat-fab id="selectButton" (click)="this.select()">
+                <mat-icon>done</mat-icon>
+            </button>
+        }
+        </mat-card-content>
 </mat-card>

@@ -6,7 +6,7 @@ import { SessionService } from '../session/session.service';
 @Injectable({
   providedIn: 'root'
 })
-export class BattlePartyService {
+export class BattleService {
 
   private _nation?: Nation$;
   set nation(value: Nation$) {
@@ -29,6 +29,16 @@ export class BattlePartyService {
   }
 
   
+  add(army: Army) {
+    if (!this._party.includes(army))
+      this._party.push(army);
+  }
+
+  remove(army: Army) {
+    if (this._party.includes(army))
+      this._party.splice(this._party.indexOf(army), 1);
+  }
+
   reset() {
     this._nation = undefined;
     this._party = [];

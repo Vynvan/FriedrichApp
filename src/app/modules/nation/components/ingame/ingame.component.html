@@ -1,10 +1,20 @@
 <div id="ingameButtons">
-    <button mat-fab id="battleButton" (click)="this.startBattle()">
-        <span class="material-symbols-outlined">swords</span>
-    </button>
-    <button mat-fab id="buyButton" (click)="this.buyTroops()">
-        <mat-icon>person_add</mat-icon>
-    </button>
+    @if (this.subState) {
+        <button mat-fab id="battleButton" (click)="this.submit()">
+            <mat-icon>done</mat-icon>
+        </button>
+        <button mat-fab id="cancelButton" (click)="this.cancel()">
+            <mat-icon>close</mat-icon>
+        </button>
+        }
+    @else {
+        <button mat-fab id="preBattleButton" (click)="this.startPreBattle()">
+            <span class="material-symbols-outlined">swords</span>
+        </button>
+        <button mat-fab id="buyButton" (click)="this.buyTroops()">
+            <mat-icon>person_add</mat-icon>
+        </button>
+    }
     @if (this.hidden) {
         <button mat-fab id="showButton" (click)="this.showArmies()">
             <mat-icon>visibility</mat-icon>

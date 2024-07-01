@@ -1,6 +1,7 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { BehaviorSubject, Observable, Subscription } from 'rxjs';
 
+import { BattleService } from '@services/battle/battle.service';
 import { RestoreService } from '@services/restore/restore.service';
 import { SessionService } from '@services/session/session.service';
 
@@ -45,7 +46,7 @@ export class GameStateService implements OnDestroy {
 
 
 
-  constructor(private session: SessionService, private restore: RestoreService) {
+  constructor(private battle: BattleService, private session: SessionService, private restore: RestoreService) {
     this._state = this.session.getState() ?? GameState.pickNations;
     this.stateSubj = new BehaviorSubject<GameState>(this._state);
     this.stateSub = this.stateSubj.subscribe(s => this.session.saveState(s));
@@ -53,18 +54,41 @@ export class GameStateService implements OnDestroy {
 
 
   /**
-   * Resets the app to start all over.
+   * Resets the current state and goes back to a default state OR when in normal state ends the app to start all over.
    */
   cancel() {
-    this.restore.delete();
-    this.session.delete();
-    this.state = GameState.pickNations;
+    switch (this._state) {
+      case GameState.buyTroops: {
+        this.restore.restore();
+        this.state = GameState.inGame;
+        break;
+      }
+      case GameState.preBattle: {
+        this.battle.reset();
+        this.state = GameState.inGame;
+        break;
+      }
+      default: {
+        this.restore.delete();
+        this.session.delete();
+        this.state = GameState.pickNations;  
+      }
+    }
   }
 
   goto(state: GameState) {
-    if ([GameState.buyTroops, GameState.battle].includes(state)) {
-      this.restore.set();
-    }
+    switch (state) {
+      case GameState.buyTroops: {
+        this.restore.set();
+        break;
+      }
+      case GameState.preBattle: {
+        this.battle.reset();
+        this.battle.nation = this.session.activeNation;
+        break;
+      }
+      default: {}
+      }
     this.state = state;
   }
 
@@ -81,10 +105,16 @@ export class GameStateService implements OnDestroy {
         this.state = next;
         break;
       }
-      default: {
+      case GameState.buyTroops: {
         this.restore.delete();
         this.state = GameState.inGame;
+        break;
       }
+      case GameState.preBattle: {
+        this.state = GameState.battle;
+        break;
+      }
+      default: {}
     }
   }
 

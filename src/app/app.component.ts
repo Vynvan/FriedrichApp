@@ -44,10 +44,6 @@ export class AppComponent {
         this.router.navigate([this.session.activeNation.name]);
         break;
       }
-      case(GameState.buyTroops): {
-        this.router.navigate([this.session.activeNation.name, 'BuyTroops']);
-        break;
-      }
     }
   }
 }

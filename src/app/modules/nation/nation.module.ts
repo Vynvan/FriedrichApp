@@ -12,7 +12,6 @@ import { DistributeComponent } from './components/distribute/distribute.componen
 import { IngameComponent } from './components/ingame/ingame.component';
 import { NationComponent } from './components/nation/nation.component';
 import { NationRoutingModule } from './nation-routing.module';
-import { RedistributeComponent } from './components/redistribute/redistribute.component';
 
 
 @NgModule({
@@ -20,8 +19,7 @@ import { RedistributeComponent } from './components/redistribute/redistribute.co
     ArmyComponent,
     DistributeComponent,
     IngameComponent,
-    NationComponent,
-    RedistributeComponent
+    NationComponent
   ],
   imports: [
     CommonModule,
